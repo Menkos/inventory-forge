@@ -1,7 +1,7 @@
-[gd_resource type="Resource" script_class="ItemDatabase" load_steps=9 format=3]
+[gd_resource type="Resource" script_class="ItemDatabase" load_steps=9 format=3 uid="uid://brmkxyrevtejq"]
 
-[ext_resource type="Script" path="res://addons/inventory_forge/resources/item_definition.gd" id="1_definition"]
-[ext_resource type="Script" path="res://addons/inventory_forge/resources/item_database.gd" id="2_database"]
+[ext_resource type="Script" uid="uid://cmpnse6xb1gml" path="res://addons/inventory_forge/resources/item_definition.gd" id="1_definition"]
+[ext_resource type="Script" uid="uid://dc4b62442egix" path="res://addons/inventory_forge/resources/item_database.gd" id="2_database"]
 
 [sub_resource type="Resource" id="item_health_potion"]
 script = ExtResource("1_definition")

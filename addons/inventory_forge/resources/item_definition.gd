@@ -205,26 +205,26 @@ signal changed_item()
 
 # === Metodi Helper ===
 
-## Ottiene il nome tradotto dell'item
+## Gets the translated name of the item
 func get_translated_name() -> String:
 	if name_key.is_empty():
 		return "???"
 	return tr(name_key)
 
 
-## Ottiene la descrizione tradotta dell'item
+## Gets the translated description of the item
 func get_translated_description() -> String:
 	if description_key.is_empty():
 		return ""
 	return tr(description_key)
 
 
-## Ottiene il colore della rarità
+## Gets the rarity color
 func get_rarity_color() -> Color:
 	return ItemEnums.get_rarity_color(rarity)
 
 
-## Genera automaticamente le chiavi di traduzione dal nome
+## Automatically generates translation keys from name
 func generate_translation_keys(base_name: String) -> void:
 	# Normalizza il nome: rimuovi spazi, converti in uppercase, sostituisci spazi con underscore
 	var normalized := base_name.strip_edges().to_upper().replace(" ", "_")
@@ -246,7 +246,7 @@ func is_valid() -> bool:
 	return id >= 0 and not name_key.is_empty()
 
 
-## Ottiene una lista di warning di validazione
+## Gets a list of validation warnings
 func get_validation_warnings() -> Array[String]:
 	var warnings: Array[String] = []
 	

@@ -23,7 +23,7 @@ func _enter_tree() -> void:
 	# Crea l'istanza del pannello principale
 	main_panel_instance = MainPanelScene.instantiate()
 	
-	# Aggiungi al main screen dell'editor
+	# Add to the editor's main screen
 	get_editor_interface().get_editor_main_screen().add_child(main_panel_instance)
 	
 	# Nascondi di default

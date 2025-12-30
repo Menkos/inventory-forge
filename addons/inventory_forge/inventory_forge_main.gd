@@ -8,7 +8,7 @@ extends Control
 
 const Settings := preload("res://addons/inventory_forge/inventory_forge_settings.gd")
 
-# === Riferimenti UI ===
+# === UI References ===
 @onready var add_button: Button = %AddButton
 @onready var duplicate_button: Button = %DuplicateButton
 @onready var delete_button: Button = %DeleteButton
@@ -19,7 +19,7 @@ const Settings := preload("res://addons/inventory_forge/inventory_forge_settings
 @onready var no_selection_label: Label = %NoSelectionLabel
 @onready var item_count_label: Label = %ItemCountLabel
 
-# Dettagli Base
+# Base Details
 @onready var icon_preview: TextureRect = %IconPreview
 @onready var item_name_label: Label = %ItemNameLabel
 @onready var item_id_label: Label = %ItemIdLabel
@@ -73,10 +73,10 @@ const Settings := preload("res://addons/inventory_forge/inventory_forge_settings
 # Validation
 @onready var warnings_container: VBoxContainer = %WarningsContainer
 
-# === Stato ===
+# === State ===
 var database: ItemDatabase = null
 var selected_item: ItemDefinition = null
-var is_updating_ui: bool = false  # Previene loop di aggiornamento
+var is_updating_ui: bool = false  # Prevents update loops
 var filtered_items: Array[ItemDefinition] = []
 
 
@@ -116,13 +116,13 @@ func _save_database() -> void:
 	if error != OK:
 		push_error("[InventoryForge] Error saving database: %s" % error)
 	else:
-		# Notifica l'editor che la risorsa è cambiata
+		# Notify editor that resource has changed
 		if Engine.is_editor_hint():
 			database.emit_changed()
 
 
 func _setup_ui() -> void:
-	# Setup filtro categoria
+	# Setup category filter
 	category_filter.clear()
 	category_filter.add_item("All Categories", -1)
 	for i in range(ItemEnums.Category.size()):
@@ -168,7 +168,7 @@ func _connect_signals() -> void:
 	# Lista
 	item_list.item_selected.connect(_on_item_selected)
 	
-	# Dettagli Base
+	# Base Details
 	id_spinbox.value_changed.connect(_on_id_changed)
 	name_key_edit.text_changed.connect(_on_name_key_changed)
 	generate_name_key_button.pressed.connect(_on_generate_name_key_pressed)
@@ -222,8 +222,8 @@ func _refresh_item_list() -> void:
 	if database == null:
 		return
 	
-	# Applica filtri
-	# Se l'indice selezionato è 0 ("Tutte le categorie"), usa -1 per non filtrare
+	# Apply filters
+	# If selected index is 0 ("All Categories"), use -1 to not filter
 	var selected_index := category_filter.selected
 	var category_id := -1 if selected_index == 0 else category_filter.get_item_id(selected_index)
 	var search_query := search_edit.text
@@ -335,7 +335,7 @@ func _update_details_panel() -> void:
 
 
 func _update_warnings() -> void:
-	# Pulisci warnings esistenti
+	# Clear existing warnings
 	for child in warnings_container.get_children():
 		child.queue_free()
 	
@@ -344,9 +344,9 @@ func _update_warnings() -> void:
 	
 	var warnings := selected_item.get_validation_warnings()
 	
-	# Aggiungi warning duplicato ID
+	# Add duplicate ID warning
 	if database.has_duplicate_id(selected_item.id, selected_item):
-		warnings.insert(0, "ID duplicato: esiste già un item con ID %d" % selected_item.id)
+		warnings.insert(0, "Duplicate ID: an item with ID %d already exists" % selected_item.id)
 	
 	for warning in warnings:
 		var label := Label.new()
@@ -377,7 +377,7 @@ func _on_duplicate_pressed() -> void:
 	_save_database()
 	_refresh_item_list()
 	
-	# Seleziona l'item duplicato
+	# Select the duplicated item
 	var idx := filtered_items.find(new_item)
 	if idx >= 0:
 		item_list.select(idx)

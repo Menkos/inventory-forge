@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cwbsm8ma4bh48"]
 
-[ext_resource type="Script" path="res://addons/inventory_forge/inventory_forge_main.gd" id="1_main"]
+[ext_resource type="Script" uid="uid://cd4jal3t1dmom" path="res://addons/inventory_forge/inventory_forge_main.gd" id="1_main"]
 
 [node name="InventoryForgeMain" type="Control"]
 layout_mode = 3
@@ -101,11 +101,6 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 allow_reselect = true
-item_count = 4
-item_0/text = "[1] ITEM_POTION_NAME"
-item_1/text = "[2] ITEM_SWORD_NAME"
-item_2/text = "[3] ITEM_MEGA_POTION_NAME"
-item_3/text = "[4] ITEM_PALLA_DI_FUOCO_NAME"
 
 [node name="RightPanel" type="PanelContainer" parent="HSplitContainer"]
 layout_mode = 2

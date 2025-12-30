@@ -58,7 +58,7 @@ static func remove_settings() -> void:
 		ProjectSettings.set_setting(SETTING_SHOW_WARNINGS, null)
 
 
-## Ottiene il percorso del database
+## Gets the database path
 static func get_database_path() -> String:
 	return ProjectSettings.get_setting(SETTING_DATABASE_PATH, DEFAULT_DATABASE_PATH)
 
@@ -79,7 +79,7 @@ static func is_show_warnings_enabled() -> bool:
 	return ProjectSettings.get_setting(SETTING_SHOW_WARNINGS, DEFAULT_SHOW_WARNINGS)
 
 
-## Crea la cartella per il database se non esiste
+## Creates the database folder if it does not exist
 static func ensure_database_directory() -> void:
 	var path := get_database_path()
 	var dir_path := path.get_base_dir()

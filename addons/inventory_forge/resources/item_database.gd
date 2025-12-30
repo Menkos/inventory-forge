@@ -23,9 +23,9 @@ signal database_changed()
 		database_changed.emit()
 
 
-# === Metodi di Ricerca ===
+# === Search Methods ===
 
-## Ottiene un item per ID
+## Gets an item by ID
 func get_item_by_id(id: int) -> ItemDefinition:
 	for item in items:
 		if item and item.id == id:
@@ -33,7 +33,7 @@ func get_item_by_id(id: int) -> ItemDefinition:
 	return null
 
 
-## Ottiene l'indice di un item per ID
+## Gets the index of an item by ID
 func get_item_index_by_id(id: int) -> int:
 	for i in range(items.size()):
 		if items[i] and items[i].id == id:
@@ -41,12 +41,12 @@ func get_item_index_by_id(id: int) -> int:
 	return -1
 
 
-## Controlla se esiste un item con l'ID specificato
+## Checks if an item with the specified ID exists
 func has_item(id: int) -> bool:
 	return get_item_by_id(id) != null
 
 
-## Ottiene tutti gli items di una categoria
+## Gets all items of a category
 func get_items_by_category(category: ItemEnums.Category) -> Array[ItemDefinition]:
 	var result: Array[ItemDefinition] = []
 	for item in items:
@@ -55,7 +55,7 @@ func get_items_by_category(category: ItemEnums.Category) -> Array[ItemDefinition
 	return result
 
 
-## Ottiene tutti gli items di una rarità
+## Gets all items of a rarity
 func get_items_by_rarity(rarity: ItemEnums.Rarity) -> Array[ItemDefinition]:
 	var result: Array[ItemDefinition] = []
 	for item in items:
@@ -64,7 +64,7 @@ func get_items_by_rarity(rarity: ItemEnums.Rarity) -> Array[ItemDefinition]:
 	return result
 
 
-## Cerca items per nome (chiave traduzione)
+## Search items by name (translation key)
 func search_items(query: String) -> Array[ItemDefinition]:
 	if query.is_empty():
 		return items.duplicate()
@@ -76,25 +76,25 @@ func search_items(query: String) -> Array[ItemDefinition]:
 		if item == null:
 			continue
 		
-		# Cerca nella chiave nome
+		# Search in name key
 		if item.name_key.to_lower().contains(query_lower):
 			result.append(item)
 			continue
 		
-		# Cerca nel nome tradotto
+		# Search in translated name
 		var translated_name := item.get_translated_name().to_lower()
 		if translated_name.contains(query_lower):
 			result.append(item)
 			continue
 		
-		# Cerca nell'ID
+		# Search in ID
 		if str(item.id).contains(query):
 			result.append(item)
 	
 	return result
 
 
-## Filtra items per categoria e query di ricerca
+## Filters items by category and search query
 func filter_items(category_filter: int = -1, search_query: String = "") -> Array[ItemDefinition]:
 	var result: Array[ItemDefinition] = []
 	
@@ -102,11 +102,11 @@ func filter_items(category_filter: int = -1, search_query: String = "") -> Array
 		if item == null:
 			continue
 		
-		# Filtro categoria (-1 = tutte)
+		# Category filter (-1 = all)
 		if category_filter >= 0 and item.category != category_filter:
 			continue
 		
-		# Filtro ricerca
+		# Search filter
 		if not search_query.is_empty():
 			var query_lower := search_query.to_lower()
 			var name_matches := item.name_key.to_lower().contains(query_lower)
@@ -123,7 +123,7 @@ func filter_items(category_filter: int = -1, search_query: String = "") -> Array
 
 # === Metodi di Gestione ===
 
-## Ottiene il prossimo ID disponibile
+## Gets the next available ID
 func get_next_available_id() -> int:
 	var max_id := -1
 	for item in items:
@@ -132,7 +132,7 @@ func get_next_available_id() -> int:
 	return max_id + 1
 
 
-## Controlla se c'è un ID duplicato
+## Checks if there is a duplicate ID
 func has_duplicate_id(id: int, exclude_item: ItemDefinition = null) -> bool:
 	var count := 0
 	for item in items:
@@ -176,7 +176,7 @@ func remove_item_by_id(id: int) -> bool:
 	return false
 
 
-## Duplica un item esistente
+## Duplicates an existing item
 func duplicate_item(item: ItemDefinition) -> ItemDefinition:
 	if item == null:
 		return null
@@ -225,7 +225,7 @@ func sort_by_category() -> void:
 
 # === Validazione ===
 
-## Ottiene tutti gli items con warning
+## Gets all items with warnings
 func get_items_with_warnings() -> Array[ItemDefinition]:
 	var result: Array[ItemDefinition] = []
 	for item in items:
@@ -234,7 +234,7 @@ func get_items_with_warnings() -> Array[ItemDefinition]:
 	return result
 
 
-## Ottiene tutti gli ID duplicati
+## Gets all duplicate IDs
 func get_duplicate_ids() -> Array[int]:
 	var id_count := {}
 	var duplicates: Array[int] = []
@@ -256,12 +256,12 @@ func get_duplicate_ids() -> Array[int]:
 func validate() -> Array[String]:
 	var errors: Array[String] = []
 	
-	# Controlla ID duplicati
+	# Check for duplicate IDs
 	var duplicate_ids := get_duplicate_ids()
 	for dup_id in duplicate_ids:
-		errors.append("ID duplicato: %d" % dup_id)
+		errors.append("Duplicate ID: %d" % dup_id)
 	
-	# Controlla items invalidi
+	# Check for invalid items
 	for item in items:
 		if item == null:
 			errors.append("Item null trovato nel database")
@@ -293,7 +293,7 @@ func export_translation_keys() -> Dictionary:
 	return keys
 
 
-## Ottiene il conteggio items per categoria
+## Gets the item count per category
 func get_category_counts() -> Dictionary:
 	var counts := {}
 	for category in ItemEnums.Category.values():
@@ -306,7 +306,7 @@ func get_category_counts() -> Dictionary:
 	return counts
 
 
-## Ottiene statistiche del database
+## Gets database statistics
 func get_stats() -> Dictionary:
 	return {
 		"total_items": items.size(),

@@ -40,14 +40,14 @@ func _load_database() -> void:
 		push_warning("[Demo] Database non trovato a: %s" % db_path)
 
 
-## Esempio: Ottiene un item per ID
+## Example: Gets an item by ID
 func get_item(item_id: int) -> ItemDefinition:
 	if database == null:
 		return null
 	return database.get_item_by_id(item_id)
 
 
-## Esempio: Ottiene il nome tradotto di un item
+## Example: Gets the translated name of an item
 func get_item_name(item_id: int) -> String:
 	var item := get_item(item_id)
 	if item:
@@ -55,14 +55,14 @@ func get_item_name(item_id: int) -> String:
 	return "???"
 
 
-## Esempio: Ottiene tutti gli items di una categoria
+## Example: Gets all items of a category
 func get_consumables() -> Array[ItemDefinition]:
 	if database == null:
 		return []
 	return database.get_items_by_category(ItemEnums.Category.CONSUMABLE)
 
 
-## Esempio: Ottiene tutti gli items equipaggiabili
+## Example: Gets all equippable items
 func get_equippable_items() -> Array[ItemDefinition]:
 	var result: Array[ItemDefinition] = []
 	if database:
