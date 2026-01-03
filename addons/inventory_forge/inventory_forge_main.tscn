@@ -13,27 +13,31 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 script = ExtResource("1_main")
 
-[node name="HSplitContainer" type="HSplitContainer" parent="."]
+[node name="MainTabContainer" type="TabContainer" parent="."]
+unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+
+[node name="Items" type="HSplitContainer" parent="MainTabContainer"]
+layout_mode = 2
 split_offset = 300
 
-[node name="LeftPanel" type="VBoxContainer" parent="HSplitContainer"]
+[node name="LeftPanel" type="VBoxContainer" parent="MainTabContainer/Items"]
 custom_minimum_size = Vector2(280, 0)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Toolbar" type="HBoxContainer" parent="HSplitContainer/LeftPanel"]
+[node name="Toolbar" type="HBoxContainer" parent="MainTabContainer/Items/LeftPanel"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_vertical = 0
 theme_override_constants/separation = 4
 
-[node name="AddButton" type="Button" parent="HSplitContainer/LeftPanel/Toolbar"]
+[node name="AddButton" type="Button" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -41,7 +45,7 @@ size_flags_vertical = 4
 tooltip_text = "New Item"
 text = "+ New"
 
-[node name="DuplicateButton" type="Button" parent="HSplitContainer/LeftPanel/Toolbar"]
+[node name="DuplicateButton" type="Button" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -50,7 +54,7 @@ tooltip_text = "Duplicate Item"
 disabled = true
 text = "Copy"
 
-[node name="DeleteButton" type="Button" parent="HSplitContainer/LeftPanel/Toolbar"]
+[node name="DeleteButton" type="Button" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(36, 36)
 layout_mode = 2
@@ -59,22 +63,41 @@ tooltip_text = "Delete Item"
 disabled = true
 text = "Delete"
 
-[node name="Spacer" type="Control" parent="HSplitContainer/LeftPanel/Toolbar"]
+[node name="ToolbarSeparator" type="VSeparator" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
+layout_mode = 2
+
+[node name="ImportButton" type="Button" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Import items from JSON or CSV"
+text = "Import"
+
+[node name="ExportButton" type="Button" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Export items to JSON or CSV"
+text = "Export"
+
+[node name="Spacer" type="Control" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ItemCountLabel" type="Label" parent="HSplitContainer/LeftPanel/Toolbar"]
+[node name="ItemCountLabel" type="Label" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "4 items"
 
-[node name="SearchEdit" type="LineEdit" parent="HSplitContainer/LeftPanel"]
+[node name="SearchEdit" type="LineEdit" parent="MainTabContainer/Items/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 placeholder_text = "Search..."
 clear_button_enabled = true
 
-[node name="CategoryFilter" type="OptionButton" parent="HSplitContainer/LeftPanel"]
+[node name="CategoryFilter" type="OptionButton" parent="MainTabContainer/Items/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 selected = 0
@@ -96,18 +119,18 @@ popup/item_6/id = 5
 popup/item_7/text = "Misc"
 popup/item_7/id = 6
 
-[node name="ItemList" type="ItemList" parent="HSplitContainer/LeftPanel"]
+[node name="ItemList" type="ItemList" parent="MainTabContainer/Items/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 allow_reselect = true
 
-[node name="RightPanel" type="PanelContainer" parent="HSplitContainer"]
+[node name="RightPanel" type="PanelContainer" parent="MainTabContainer/Items"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="MarginContainer" type="MarginContainer" parent="HSplitContainer/RightPanel"]
+[node name="MarginContainer" type="MarginContainer" parent="MainTabContainer/Items/RightPanel"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -116,7 +139,7 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 10
 theme_override_constants/margin_bottom = 10
 
-[node name="NoSelectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer"]
+[node name="NoSelectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "Select an item from the list
@@ -124,11 +147,11 @@ or click + to create a new one"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MainVSplit" type="VSplitContainer" parent="HSplitContainer/RightPanel/MarginContainer"]
+[node name="MainVSplit" type="VSplitContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer"]
 layout_mode = 2
 split_offset = 400
 
-[node name="DetailsContainer" type="ScrollContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit"]
+[node name="DetailsContainer" type="ScrollContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit"]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(0, 200)
@@ -137,142 +160,142 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="DetailsVBox" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer"]
+[node name="DetailsVBox" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 10
 
-[node name="HeaderSection" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+[node name="HeaderSection" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
 layout_mode = 2
 
-[node name="IconPreview" type="TextureRect" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection"]
+[node name="IconPreview" type="TextureRect" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(64, 64)
 layout_mode = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="HeaderInfo" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection"]
+[node name="HeaderInfo" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ItemNameLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection/HeaderInfo"]
+[node name="ItemNameLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection/HeaderInfo"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Item Name"
 
-[node name="ItemIdLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection/HeaderInfo"]
+[node name="ItemIdLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/HeaderSection/HeaderInfo"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "ID: 0"
 
-[node name="HSeparator" type="HSeparator" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+[node name="HSeparator" type="HSeparator" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
 layout_mode = 2
 
-[node name="TwoColumnsContainer" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+[node name="TwoColumnsContainer" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
 layout_mode = 2
 theme_override_constants/separation = 30
 
-[node name="LeftColumn" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer"]
+[node name="LeftColumn" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="BaseSection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn"]
+[node name="BaseSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn"]
 layout_mode = 2
 
-[node name="BaseSectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
+[node name="BaseSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "BASE"
 
-[node name="IdRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
+[node name="IdRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
 layout_mode = 2
 
-[node name="IdLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IdRow"]
+[node name="IdLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IdRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "ID"
 
-[node name="IdSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IdRow"]
+[node name="IdSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IdRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 min_value = -1.0
 max_value = 99999.0
 
-[node name="NameKeyRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
+[node name="NameKeyRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
 layout_mode = 2
 
-[node name="NameKeyLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/NameKeyRow"]
+[node name="NameKeyLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/NameKeyRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Name Key"
 
-[node name="NameKeyEdit" type="LineEdit" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/NameKeyRow"]
+[node name="NameKeyEdit" type="LineEdit" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/NameKeyRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "ITEM_NAME"
 
-[node name="GenerateNameKeyButton" type="Button" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/NameKeyRow"]
+[node name="GenerateNameKeyButton" type="Button" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/NameKeyRow"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Generate key automatically"
 text = "Gen"
 
-[node name="DescKeyRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
+[node name="DescKeyRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
 layout_mode = 2
 
-[node name="DescKeyLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/DescKeyRow"]
+[node name="DescKeyLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/DescKeyRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Desc Key"
 
-[node name="DescKeyEdit" type="LineEdit" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/DescKeyRow"]
+[node name="DescKeyEdit" type="LineEdit" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/DescKeyRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 placeholder_text = "ITEM_DESC"
 
-[node name="GenerateDescKeyButton" type="Button" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/DescKeyRow"]
+[node name="GenerateDescKeyButton" type="Button" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/DescKeyRow"]
 unique_name_in_owner = true
 layout_mode = 2
 tooltip_text = "Generate key automatically"
 text = "Gen"
 
-[node name="IconRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
+[node name="IconRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
 layout_mode = 2
 
-[node name="IconLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IconRow"]
+[node name="IconLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IconRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Icon"
 
-[node name="IconPicker" type="Button" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IconRow"]
+[node name="IconPicker" type="Button" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IconRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Select icon..."
 
-[node name="ClearIconButton" type="Button" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IconRow"]
+[node name="ClearIconButton" type="Button" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/IconRow"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(32, 0)
 layout_mode = 2
 tooltip_text = "Remove icon"
 text = "X"
 
-[node name="CategoryRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
+[node name="CategoryRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection"]
 layout_mode = 2
 
-[node name="CategoryLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/CategoryRow"]
+[node name="CategoryLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/CategoryRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Category"
 
-[node name="CategoryOption" type="OptionButton" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/CategoryRow"]
+[node name="CategoryOption" type="OptionButton" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/BaseSection/CategoryRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -293,24 +316,24 @@ popup/item_5/id = 5
 popup/item_6/text = "Misc"
 popup/item_6/id = 6
 
-[node name="StackSection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn"]
+[node name="StackSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn"]
 layout_mode = 2
 
-[node name="StackSectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection"]
+[node name="StackSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "STACK"
 
-[node name="StackCapacityRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection"]
+[node name="StackCapacityRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection"]
 layout_mode = 2
 
-[node name="StackCapacityLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackCapacityRow"]
+[node name="StackCapacityLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackCapacityRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Stack Capacity"
 
-[node name="StackCapacitySpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackCapacityRow"]
+[node name="StackCapacitySpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackCapacityRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -318,97 +341,97 @@ min_value = 1.0
 max_value = 999.0
 value = 99.0
 
-[node name="StackLimitRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection"]
+[node name="StackLimitRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection"]
 layout_mode = 2
 
-[node name="StackLimitLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackLimitRow"]
+[node name="StackLimitLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackLimitRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Stack Limit"
 
-[node name="StackLimitSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackLimitRow"]
+[node name="StackLimitSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/StackSection/StackLimitRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 999.0
 suffix = "(0 = inf)"
 
-[node name="EconomySection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn"]
+[node name="EconomySection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn"]
 layout_mode = 2
 
-[node name="EconomySectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
+[node name="EconomySectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "ECONOMY"
 
-[node name="BuyPriceRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
+[node name="BuyPriceRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
 layout_mode = 2
 
-[node name="BuyPriceLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/BuyPriceRow"]
+[node name="BuyPriceLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/BuyPriceRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Buy Price"
 
-[node name="BuyPriceSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/BuyPriceRow"]
+[node name="BuyPriceSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/BuyPriceRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 999999.0
 
-[node name="SellPriceRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
+[node name="SellPriceRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
 layout_mode = 2
 
-[node name="SellPriceLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/SellPriceRow"]
+[node name="SellPriceLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/SellPriceRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Sell Price"
 
-[node name="SellPriceSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/SellPriceRow"]
+[node name="SellPriceSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/SellPriceRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 999999.0
 
-[node name="TradeableRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
+[node name="TradeableRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection"]
 layout_mode = 2
 
-[node name="TradeableLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/TradeableRow"]
+[node name="TradeableLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/TradeableRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Tradeable"
 
-[node name="TradeableCheck" type="CheckBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/TradeableRow"]
+[node name="TradeableCheck" type="CheckBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn/EconomySection/TradeableRow"]
 unique_name_in_owner = true
 layout_mode = 2
 button_pressed = true
 
-[node name="VSeparator" type="VSeparator" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer"]
+[node name="VSeparator" type="VSeparator" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer"]
 layout_mode = 2
 size_flags_stretch_ratio = 0.1
 
-[node name="RightColumn" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer"]
+[node name="RightColumn" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="RaritySection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn"]
+[node name="RaritySection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn"]
 layout_mode = 2
 
-[node name="RaritySectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection"]
+[node name="RaritySectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "RARITY"
 
-[node name="RarityRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection"]
+[node name="RarityRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection"]
 layout_mode = 2
 
-[node name="RarityLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RarityRow"]
+[node name="RarityLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RarityRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Rarity"
 
-[node name="RarityOption" type="OptionButton" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RarityRow"]
+[node name="RarityOption" type="OptionButton" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RarityRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -425,49 +448,49 @@ popup/item_3/id = 3
 popup/item_4/text = "Legendary"
 popup/item_4/id = 4
 
-[node name="RequiredLevelRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection"]
+[node name="RequiredLevelRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection"]
 layout_mode = 2
 
-[node name="RequiredLevelLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RequiredLevelRow"]
+[node name="RequiredLevelLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RequiredLevelRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Required Level"
 
-[node name="RequiredLevelSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RequiredLevelRow"]
+[node name="RequiredLevelSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/RaritySection/RequiredLevelRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="EquipmentSection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn"]
+[node name="EquipmentSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn"]
 layout_mode = 2
 
-[node name="EquipmentSectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
+[node name="EquipmentSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "EQUIPMENT"
 
-[node name="EquippableRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
+[node name="EquippableRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
 layout_mode = 2
 
-[node name="EquippableLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquippableRow"]
+[node name="EquippableLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquippableRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Equippable"
 
-[node name="EquippableCheck" type="CheckBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquippableRow"]
+[node name="EquippableCheck" type="CheckBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquippableRow"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="EquipSlotRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
+[node name="EquipSlotRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
 layout_mode = 2
 
-[node name="EquipSlotLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquipSlotRow"]
+[node name="EquipSlotLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquipSlotRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Equip Slot"
 
-[node name="EquipSlotOption" type="OptionButton" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquipSlotRow"]
+[node name="EquipSlotOption" type="OptionButton" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/EquipSlotRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -492,110 +515,110 @@ popup/item_7/id = 7
 popup/item_8/text = "Accessory 2"
 popup/item_8/id = 8
 
-[node name="StatsContainer" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
+[node name="StatsContainer" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="StatsLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer"]
+[node name="StatsLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "Stats:"
 
-[node name="StatsGrid" type="GridContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer"]
+[node name="StatsGrid" type="GridContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer"]
 layout_mode = 2
 columns = 4
 
-[node name="AtkLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="AtkLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "ATK"
 
-[node name="StatAtkSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="StatAtkSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = -999.0
 max_value = 999.0
 
-[node name="DefLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="DefLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "DEF"
 
-[node name="StatDefSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="StatDefSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = -999.0
 max_value = 999.0
 
-[node name="HpLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="HpLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "HP"
 
-[node name="StatHpSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="StatHpSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = -9999.0
 max_value = 9999.0
 
-[node name="MpLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="MpLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "MP"
 
-[node name="StatMpSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="StatMpSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = -9999.0
 max_value = 9999.0
 
-[node name="SpdLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="SpdLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 custom_minimum_size = Vector2(40, 0)
 layout_mode = 2
 text = "SPD"
 
-[node name="StatSpdSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
+[node name="StatSpdSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/EquipmentSection/StatsContainer/StatsGrid"]
 unique_name_in_owner = true
 layout_mode = 2
 min_value = -999.0
 max_value = 999.0
 
-[node name="ConsumableSection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn"]
+[node name="ConsumableSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn"]
 layout_mode = 2
 
-[node name="ConsumableSectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection"]
+[node name="ConsumableSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "CONSUMABLE"
 
-[node name="ConsumableRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection"]
+[node name="ConsumableRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection"]
 layout_mode = 2
 
-[node name="ConsumableLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableRow"]
+[node name="ConsumableLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Consumable"
 
-[node name="ConsumableCheck" type="CheckBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableRow"]
+[node name="ConsumableCheck" type="CheckBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableRow"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="ConsumableContainer" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection"]
+[node name="ConsumableContainer" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="EffectTypeRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer"]
+[node name="EffectTypeRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer"]
 layout_mode = 2
 
-[node name="EffectTypeLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectTypeRow"]
+[node name="EffectTypeLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectTypeRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Effect Type"
 
-[node name="EffectTypeOption" type="OptionButton" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectTypeRow"]
+[node name="EffectTypeOption" type="OptionButton" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectTypeRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -626,29 +649,29 @@ popup/item_10/id = 10
 popup/item_11/text = "Revive"
 popup/item_11/id = 11
 
-[node name="EffectValueRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer"]
+[node name="EffectValueRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer"]
 layout_mode = 2
 
-[node name="EffectValueLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectValueRow"]
+[node name="EffectValueLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectValueRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Effect Value"
 
-[node name="EffectValueSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectValueRow"]
+[node name="EffectValueSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectValueRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 max_value = 9999.0
 
-[node name="EffectDurationRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer"]
+[node name="EffectDurationRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer"]
 layout_mode = 2
 
-[node name="EffectDurationLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectDurationRow"]
+[node name="EffectDurationLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectDurationRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Duration (sec)"
 
-[node name="EffectDurationSpinBox" type="SpinBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectDurationRow"]
+[node name="EffectDurationSpinBox" type="SpinBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/RightColumn/ConsumableSection/ConsumableContainer/EffectDurationRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -656,139 +679,576 @@ max_value = 600.0
 step = 0.1
 suffix = "s"
 
-[node name="HSeparator2" type="HSeparator" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+[node name="HSeparator2" type="HSeparator" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
 layout_mode = 2
 
-[node name="QuestSection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+[node name="QuestSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
 layout_mode = 2
 
-[node name="QuestSectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection"]
+[node name="QuestSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "QUEST"
 
-[node name="QuestItemRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection"]
+[node name="QuestItemRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection"]
 layout_mode = 2
 
-[node name="QuestItemLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection/QuestItemRow"]
+[node name="QuestItemLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection/QuestItemRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Quest Item"
 
-[node name="QuestItemCheck" type="CheckBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection/QuestItemRow"]
+[node name="QuestItemCheck" type="CheckBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection/QuestItemRow"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="QuestIdEdit" type="LineEdit" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection"]
+[node name="QuestIdEdit" type="LineEdit" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/QuestSection"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 placeholder_text = "Quest ID (opzionale)"
 
-[node name="CraftingSection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+[node name="CraftingSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
 layout_mode = 2
 
-[node name="CraftingSectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
+[node name="CraftingSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
 theme_override_font_sizes/font_size = 14
 text = "CRAFTING"
 
-[node name="IsIngredientRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
+[node name="IsIngredientRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
 layout_mode = 2
 
-[node name="IsIngredientLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IsIngredientRow"]
+[node name="IsIngredientLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IsIngredientRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Is Ingredient"
 
-[node name="IsIngredientCheck" type="CheckBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IsIngredientRow"]
+[node name="IsIngredientCheck" type="CheckBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IsIngredientRow"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="MaterialTypeRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
+[node name="MaterialTypeRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 
-[node name="MaterialTypeLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/MaterialTypeRow"]
+[node name="MaterialTypeLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/MaterialTypeRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Material Type"
 
-[node name="MaterialTypeOption" type="OptionButton" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/MaterialTypeRow"]
+[node name="MaterialTypeOption" type="OptionButton" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/MaterialTypeRow"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="CraftingSeparator" type="HSeparator" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
+[node name="CraftingSeparator" type="HSeparator" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
 layout_mode = 2
 
-[node name="CraftableRow" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
+[node name="CraftableRow" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
 layout_mode = 2
 
-[node name="CraftableLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/CraftableRow"]
+[node name="CraftableLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/CraftableRow"]
 custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 text = "Craftable"
 
-[node name="CraftableCheck" type="CheckBox" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/CraftableRow"]
+[node name="CraftableCheck" type="CheckBox" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/CraftableRow"]
 unique_name_in_owner = true
 layout_mode = 2
 
-[node name="IngredientsContainer" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
+[node name="IngredientsContainer" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 6
 
-[node name="IngredientsHeader" type="HBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer"]
+[node name="IngredientsHeader" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer"]
 layout_mode = 2
 
-[node name="IngredientsLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsHeader"]
+[node name="IngredientsLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsHeader"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.7, 0.7, 0.7, 1)
 text = "Ingredients:"
 
-[node name="Spacer" type="Control" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsHeader"]
+[node name="Spacer" type="Control" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsHeader"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="AddIngredientButton" type="Button" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsHeader"]
+[node name="AddIngredientButton" type="Button" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsHeader"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 tooltip_text = "Add ingredient (max 10)"
 text = "+ Add"
 
-[node name="IngredientsScroll" type="ScrollContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer"]
+[node name="IngredientsScroll" type="ScrollContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer"]
 custom_minimum_size = Vector2(0, 150)
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
-[node name="IngredientsListVBox" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsScroll"]
+[node name="IngredientsListVBox" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="WarningsPanel" type="PanelContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit"]
+[node name="CustomFieldsSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="CustomFieldsSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CustomFieldsSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "CUSTOM FIELDS"
+
+[node name="CustomFieldsHeader" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CustomFieldsSection"]
+layout_mode = 2
+
+[node name="CustomFieldsInfo" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CustomFieldsSection/CustomFieldsHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "Add custom properties for game-specific data"
+
+[node name="CustomFieldsSpacer" type="Control" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CustomFieldsSection/CustomFieldsHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddCustomFieldButton" type="Button" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CustomFieldsSection/CustomFieldsHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+tooltip_text = "Add a new custom field"
+text = "+ Add Field"
+
+[node name="CustomFieldsContainer" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CustomFieldsSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="WarningsPanel" type="PanelContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit"]
 custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="WarningsSection" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/WarningsPanel"]
+[node name="WarningsSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/WarningsPanel"]
 layout_mode = 2
 
-[node name="WarningsSectionLabel" type="Label" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/WarningsPanel/WarningsSection"]
+[node name="WarningsSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/WarningsPanel/WarningsSection"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.6, 0.2, 1)
 theme_override_font_sizes/font_size = 14
 text = "WARNINGS"
 
-[node name="WarningsContainer" type="VBoxContainer" parent="HSplitContainer/RightPanel/MarginContainer/MainVSplit/WarningsPanel/WarningsSection"]
+[node name="WarningsContainer" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/WarningsPanel/WarningsSection"]
 unique_name_in_owner = true
 layout_mode = 2
+
+[node name="LootTables" type="HSplitContainer" parent="MainTabContainer"]
+layout_mode = 2
+split_offset = 280
+
+[node name="LootLeftPanel" type="VBoxContainer" parent="MainTabContainer/LootTables"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="LootToolbar" type="HBoxContainer" parent="MainTabContainer/LootTables/LootLeftPanel"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+size_flags_vertical = 0
+theme_override_constants/separation = 4
+
+[node name="AddLootTableButton" type="Button" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "New Loot Table"
+text = "+ New"
+
+[node name="DuplicateLootTableButton" type="Button" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Duplicate Loot Table"
+disabled = true
+text = "Copy"
+
+[node name="DeleteLootTableButton" type="Button" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Delete Loot Table"
+disabled = true
+text = "Delete"
+
+[node name="LootToolbarSep" type="VSeparator" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+layout_mode = 2
+
+[node name="ImportLootButton" type="Button" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Import Loot Tables from JSON/CSV"
+text = "Import"
+
+[node name="ExportLootButton" type="Button" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 36)
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Export Loot Tables to JSON/CSV"
+text = "Export"
+
+[node name="LootSpacer" type="Control" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="LootTableCountLabel" type="Label" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 tables"
+
+[node name="LootSearchEdit" type="LineEdit" parent="MainTabContainer/LootTables/LootLeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+placeholder_text = "Search loot tables..."
+clear_button_enabled = true
+
+[node name="LootTableList" type="ItemList" parent="MainTabContainer/LootTables/LootLeftPanel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+allow_reselect = true
+
+[node name="LootRightPanel" type="PanelContainer" parent="MainTabContainer/LootTables"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+
+[node name="LootMarginContainer" type="MarginContainer" parent="MainTabContainer/LootTables/LootRightPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 15
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 15
+theme_override_constants/margin_bottom = 15
+
+[node name="LootNoSelectionLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+text = "Select a loot table to edit"
+
+[node name="LootDetailsScroll" type="ScrollContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="LootDetailsVBox" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 15
+
+[node name="LootHeaderSection" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="LootTableNameLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Loot Table Name"
+
+[node name="IdRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection"]
+layout_mode = 2
+
+[node name="IdLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection/IdRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "ID:"
+
+[node name="LootIdEdit" type="LineEdit" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection/IdRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "unique_id"
+
+[node name="NameRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection/NameRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Name:"
+
+[node name="LootNameEdit" type="LineEdit" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection/NameRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Display Name"
+
+[node name="DescRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection"]
+layout_mode = 2
+
+[node name="DescLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection/DescRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Description:"
+
+[node name="LootDescEdit" type="TextEdit" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootHeaderSection/DescRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Description of when this loot table is used..."
+
+[node name="LootSeparator1" type="HSeparator" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+
+[node name="RarityPresetSection" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="RarityPresetLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/RarityPresetSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "RARITY PRESET"
+
+[node name="RarityTierRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/RarityPresetSection"]
+layout_mode = 2
+
+[node name="RarityTierLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/RarityPresetSection/RarityTierRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Rarity Tier:"
+
+[node name="RarityTierOption" type="OptionButton" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/RarityPresetSection/RarityTierRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+selected = 0
+item_count = 6
+popup/item_0/text = "Custom (Manual)"
+popup/item_0/id = 0
+popup/item_1/text = "Common (100%, 1-2 drops)"
+popup/item_1/id = 1
+popup/item_2/text = "Uncommon (80%, 1-2 drops)"
+popup/item_2/id = 2
+popup/item_3/text = "Rare (30%, 1 drop)"
+popup/item_3/id = 3
+popup/item_4/text = "Epic (10%, 1 drop)"
+popup/item_4/id = 4
+popup/item_5/text = "Legendary (2%, 1 drop)"
+popup/item_5/id = 5
+
+[node name="RarityDescLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/RarityPresetSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 11
+text = "Select a preset to auto-configure drop settings, or use Custom for manual control"
+
+[node name="LootSeparator1b" type="HSeparator" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+
+[node name="LootSettingsSection" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SettingsLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SETTINGS"
+
+[node name="DropsRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection"]
+layout_mode = 2
+
+[node name="DropsLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/DropsRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Drops:"
+
+[node name="MinDropsSpinBox" type="SpinBox" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/DropsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.0
+max_value = 10.0
+value = 1.0
+
+[node name="ToLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/DropsRow"]
+layout_mode = 2
+text = " to "
+
+[node name="MaxDropsSpinBox" type="SpinBox" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/DropsRow"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.0
+max_value = 10.0
+value = 1.0
+
+[node name="ItemsLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/DropsRow"]
+layout_mode = 2
+text = " items"
+
+[node name="EmptyChanceRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection"]
+layout_mode = 2
+
+[node name="EmptyChanceLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/EmptyChanceRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Empty Chance:"
+
+[node name="EmptyChanceSpinBox" type="SpinBox" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/EmptyChanceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 100.0
+suffix = "%"
+
+[node name="AllowDuplicatesRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection"]
+layout_mode = 2
+
+[node name="AllowDuplicatesLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/AllowDuplicatesRow"]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "Allow Duplicates:"
+
+[node name="AllowDuplicatesCheck" type="CheckBox" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/AllowDuplicatesRow"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+
+[node name="LootSeparator2" type="HSeparator" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+
+[node name="LootEntriesSection" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="EntriesHeader" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootEntriesSection"]
+layout_mode = 2
+
+[node name="EntriesLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootEntriesSection/EntriesHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "ENTRIES"
+
+[node name="EntriesSpacer" type="Control" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootEntriesSection/EntriesHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddEntryButton" type="Button" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootEntriesSection/EntriesHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "+ Add Entry"
+
+[node name="LootEntriesContainer" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootEntriesSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="LootSeparator3" type="HSeparator" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+
+[node name="SubTablesSection" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="SubTablesHeader" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/SubTablesSection"]
+layout_mode = 2
+
+[node name="SubTablesLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/SubTablesSection/SubTablesHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "SUB-TABLES"
+
+[node name="SubTablesSpacer" type="Control" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/SubTablesSection/SubTablesHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddSubTableButton" type="Button" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/SubTablesSection/SubTablesHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "+ Add Sub-Table"
+
+[node name="SubTablesInfo" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/SubTablesSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.5, 0.5, 1)
+theme_override_font_sizes/font_size = 11
+text = "Sub-tables are rolled together with this table when using roll_table_full()"
+
+[node name="SubTablesContainer" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/SubTablesSection"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="LootSeparator4" type="HSeparator" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+
+[node name="LootTestSection" type="VBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="TestHeader" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootTestSection"]
+layout_mode = 2
+
+[node name="TestLabel" type="Label" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootTestSection/TestHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.8, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "TEST ROLL"
+
+[node name="TestSpacer" type="Control" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootTestSection/TestHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TestRollButton" type="Button" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootTestSection/TestHeader"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Roll!"
+
+[node name="TestResultLabel" type="RichTextLabel" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootTestSection"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+bbcode_enabled = true
+text = "[i]Click 'Roll!' to test the loot table[/i]"
+
+[node name="Statistics" type="MarginContainer" parent="MainTabContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="StatsScrollContainer" type="ScrollContainer" parent="MainTabContainer/Statistics"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="StatsVBox" type="VBoxContainer" parent="MainTabContainer/Statistics/StatsScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20

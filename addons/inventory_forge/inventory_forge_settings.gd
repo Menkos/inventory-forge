@@ -8,10 +8,12 @@ extends RefCounted
 ## License: MIT
 
 const SETTING_DATABASE_PATH := "inventory_forge/database/path"
+const SETTING_LOOT_DATABASE_PATH := "inventory_forge/database/loot_tables_path"
 const SETTING_AUTO_SAVE := "inventory_forge/editor/auto_save"
 const SETTING_SHOW_WARNINGS := "inventory_forge/editor/show_warnings"
 
 const DEFAULT_DATABASE_PATH := "res://addons/inventory_forge/demo/demo_database.tres"
+const DEFAULT_LOOT_DATABASE_PATH := "res://addons/inventory_forge/demo/demo_loot_tables.tres"
 const DEFAULT_AUTO_SAVE := true
 const DEFAULT_SHOW_WARNINGS := true
 
@@ -24,6 +26,17 @@ static func initialize_settings() -> void:
 	ProjectSettings.set_initial_value(SETTING_DATABASE_PATH, DEFAULT_DATABASE_PATH)
 	ProjectSettings.add_property_info({
 		"name": SETTING_DATABASE_PATH,
+		"type": TYPE_STRING,
+		"hint": PROPERTY_HINT_FILE,
+		"hint_string": "*.tres"
+	})
+	
+	# Loot Tables Database path
+	if not ProjectSettings.has_setting(SETTING_LOOT_DATABASE_PATH):
+		ProjectSettings.set_setting(SETTING_LOOT_DATABASE_PATH, DEFAULT_LOOT_DATABASE_PATH)
+	ProjectSettings.set_initial_value(SETTING_LOOT_DATABASE_PATH, DEFAULT_LOOT_DATABASE_PATH)
+	ProjectSettings.add_property_info({
+		"name": SETTING_LOOT_DATABASE_PATH,
 		"type": TYPE_STRING,
 		"hint": PROPERTY_HINT_FILE,
 		"hint_string": "*.tres"
@@ -52,6 +65,8 @@ static func initialize_settings() -> void:
 static func remove_settings() -> void:
 	if ProjectSettings.has_setting(SETTING_DATABASE_PATH):
 		ProjectSettings.set_setting(SETTING_DATABASE_PATH, null)
+	if ProjectSettings.has_setting(SETTING_LOOT_DATABASE_PATH):
+		ProjectSettings.set_setting(SETTING_LOOT_DATABASE_PATH, null)
 	if ProjectSettings.has_setting(SETTING_AUTO_SAVE):
 		ProjectSettings.set_setting(SETTING_AUTO_SAVE, null)
 	if ProjectSettings.has_setting(SETTING_SHOW_WARNINGS):
@@ -66,6 +81,17 @@ static func get_database_path() -> String:
 ## Imposta il percorso del database
 static func set_database_path(path: String) -> void:
 	ProjectSettings.set_setting(SETTING_DATABASE_PATH, path)
+	ProjectSettings.save()
+
+
+## Gets the loot tables database path
+static func get_loot_database_path() -> String:
+	return ProjectSettings.get_setting(SETTING_LOOT_DATABASE_PATH, DEFAULT_LOOT_DATABASE_PATH)
+
+
+## Sets the loot tables database path
+static func set_loot_database_path(path: String) -> void:
+	ProjectSettings.set_setting(SETTING_LOOT_DATABASE_PATH, path)
 	ProjectSettings.save()
 
 

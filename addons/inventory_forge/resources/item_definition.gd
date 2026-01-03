@@ -221,6 +221,19 @@ signal changed_item()
 		changed_item.emit()
 
 
+# === Custom Fields ===
+@export_group("Custom Fields")
+
+## User-defined custom properties for game-specific data.
+## Supports String, int, float, bool values.
+## Example: {"damage_type": "fire", "cooldown": 2.5, "is_legendary": true}
+@export var custom_fields: Dictionary = {}:
+	set(value):
+		custom_fields = value
+		emit_changed()
+		changed_item.emit()
+
+
 # === Metodi Helper ===
 
 ## Gets the translated name of the item
@@ -396,6 +409,7 @@ func duplicate_item() -> ItemDefinition:
 	new_item.material_type = material_type
 	new_item.craftable = craftable
 	new_item.ingredients = ingredients.duplicate(true)
+	new_item.custom_fields = custom_fields.duplicate(true)
 	
 	return new_item
 
@@ -421,4 +435,108 @@ func to_dictionary() -> Dictionary:
 		"is_ingredient": is_ingredient,
 		"material_type": material_type,
 		"craftable": craftable,
+		"custom_fields": custom_fields.duplicate(),
 	}
+
+
+# === Custom Fields Methods ===
+
+## Gets a custom field value with optional default
+func get_custom(key: String, default: Variant = null) -> Variant:
+	return custom_fields.get(key, default)
+
+
+## Sets a custom field value
+func set_custom(key: String, value: Variant) -> void:
+	custom_fields[key] = value
+	emit_changed()
+	changed_item.emit()
+
+
+## Checks if a custom field exists
+func has_custom(key: String) -> bool:
+	return custom_fields.has(key)
+
+
+## Removes a custom field
+func remove_custom(key: String) -> bool:
+	if custom_fields.has(key):
+		custom_fields.erase(key)
+		emit_changed()
+		changed_item.emit()
+		return true
+	return false
+
+
+## Gets all custom field keys
+func get_custom_keys() -> Array:
+	return custom_fields.keys()
+
+
+## Gets a custom field as String (with type conversion)
+func get_custom_string(key: String, default: String = "") -> String:
+	var value = custom_fields.get(key)
+	if value == null:
+		return default
+	return str(value)
+
+
+## Gets a custom field as int (with type conversion)
+func get_custom_int(key: String, default: int = 0) -> int:
+	var value = custom_fields.get(key)
+	if value == null:
+		return default
+	if value is int:
+		return value
+	if value is float:
+		return int(value)
+	if value is String and value.is_valid_int():
+		return int(value)
+	return default
+
+
+## Gets a custom field as float (with type conversion)
+func get_custom_float(key: String, default: float = 0.0) -> float:
+	var value = custom_fields.get(key)
+	if value == null:
+		return default
+	if value is float:
+		return value
+	if value is int:
+		return float(value)
+	if value is String and value.is_valid_float():
+		return float(value)
+	return default
+
+
+## Gets a custom field as bool (with type conversion)
+func get_custom_bool(key: String, default: bool = false) -> bool:
+	var value = custom_fields.get(key)
+	if value == null:
+		return default
+	if value is bool:
+		return value
+	if value is int:
+		return value != 0
+	if value is String:
+		return value.to_lower() in ["true", "1", "yes", "on"]
+	return default
+
+
+## Clears all custom fields
+func clear_custom_fields() -> void:
+	custom_fields.clear()
+	emit_changed()
+	changed_item.emit()
+
+
+## Merges custom fields from another dictionary
+func merge_custom_fields(fields: Dictionary, overwrite: bool = true) -> void:
+	if overwrite:
+		custom_fields.merge(fields, true)
+	else:
+		for key in fields:
+			if not custom_fields.has(key):
+				custom_fields[key] = fields[key]
+	emit_changed()
+	changed_item.emit()

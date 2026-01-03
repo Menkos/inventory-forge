@@ -7,6 +7,7 @@ extends Control
 ## License: MIT
 
 const Settings := preload("res://addons/inventory_forge/inventory_forge_settings.gd")
+const IconPickerDialog := preload("res://addons/inventory_forge/ui/icon_picker_dialog.gd")
 
 # === Constants ===
 const MAX_INGREDIENTS := 10  # Limite massimo ingredienti per ricetta
@@ -15,6 +16,8 @@ const MAX_INGREDIENTS := 10  # Limite massimo ingredienti per ricetta
 @onready var add_button: Button = %AddButton
 @onready var duplicate_button: Button = %DuplicateButton
 @onready var delete_button: Button = %DeleteButton
+@onready var import_button: Button = %ImportButton
+@onready var export_button: Button = %ExportButton
 @onready var search_edit: LineEdit = %SearchEdit
 @onready var category_filter: OptionButton = %CategoryFilter
 @onready var item_list: ItemList = %ItemList
@@ -78,6 +81,10 @@ const MAX_INGREDIENTS := 10  # Limite massimo ingredienti per ricetta
 @onready var add_ingredient_button: Button = get_node_or_null("%AddIngredientButton")
 @onready var ingredients_list_vbox: VBoxContainer = get_node_or_null("%IngredientsListVBox")
 
+# Custom Fields
+@onready var add_custom_field_button: Button = get_node_or_null("%AddCustomFieldButton")
+@onready var custom_fields_container: VBoxContainer = get_node_or_null("%CustomFieldsContainer")
+
 # Validation
 @onready var warnings_container: VBoxContainer = %WarningsContainer
 
@@ -87,16 +94,63 @@ var selected_item: ItemDefinition = null
 var is_updating_ui: bool = false  # Prevents update loops
 var filtered_items: Array[ItemDefinition] = []
 
+# Statistics Dashboard
+@onready var main_tab_container: TabContainer = get_node_or_null("%MainTabContainer")
+@onready var stats_scroll_container: ScrollContainer = get_node_or_null("%StatsScrollContainer")
+@onready var stats_vbox: VBoxContainer = get_node_or_null("%StatsVBox")
+
+# Loot Tables Tab
+@onready var add_loot_table_button: Button = get_node_or_null("%AddLootTableButton")
+@onready var duplicate_loot_table_button: Button = get_node_or_null("%DuplicateLootTableButton")
+@onready var delete_loot_table_button: Button = get_node_or_null("%DeleteLootTableButton")
+@onready var import_loot_button: Button = get_node_or_null("%ImportLootButton")
+@onready var export_loot_button: Button = get_node_or_null("%ExportLootButton")
+@onready var loot_table_count_label: Label = get_node_or_null("%LootTableCountLabel")
+@onready var loot_search_edit: LineEdit = get_node_or_null("%LootSearchEdit")
+@onready var loot_table_list: ItemList = get_node_or_null("%LootTableList")
+@onready var loot_no_selection_label: Label = get_node_or_null("%LootNoSelectionLabel")
+@onready var loot_details_scroll: ScrollContainer = get_node_or_null("%LootDetailsScroll")
+@onready var loot_table_name_label: Label = get_node_or_null("%LootTableNameLabel")
+@onready var loot_id_edit: LineEdit = get_node_or_null("%LootIdEdit")
+@onready var loot_name_edit: LineEdit = get_node_or_null("%LootNameEdit")
+@onready var loot_desc_edit: TextEdit = get_node_or_null("%LootDescEdit")
+@onready var min_drops_spinbox: SpinBox = get_node_or_null("%MinDropsSpinBox")
+@onready var max_drops_spinbox: SpinBox = get_node_or_null("%MaxDropsSpinBox")
+@onready var empty_chance_spinbox: SpinBox = get_node_or_null("%EmptyChanceSpinBox")
+@onready var allow_duplicates_check: CheckBox = get_node_or_null("%AllowDuplicatesCheck")
+@onready var add_entry_button: Button = get_node_or_null("%AddEntryButton")
+@onready var loot_entries_container: VBoxContainer = get_node_or_null("%LootEntriesContainer")
+@onready var test_roll_button: Button = get_node_or_null("%TestRollButton")
+@onready var test_result_label: RichTextLabel = get_node_or_null("%TestResultLabel")
+
+# Rarity Preset
+@onready var rarity_tier_option: OptionButton = get_node_or_null("%RarityTierOption")
+@onready var rarity_desc_label: Label = get_node_or_null("%RarityDescLabel")
+
+# Sub-Tables
+@onready var add_sub_table_button: Button = get_node_or_null("%AddSubTableButton")
+@onready var sub_tables_container: VBoxContainer = get_node_or_null("%SubTablesContainer")
+
+# Loot Tables State
+var loot_database: LootTableDatabase = null
+var selected_loot_table: LootTable = null
+var filtered_loot_tables: Array[LootTable] = []
+
 
 func _ready() -> void:
 	if not Engine.is_editor_hint():
 		return
 	
 	_load_database()
+	_load_loot_database()
 	_setup_ui()
+	_setup_statistics_tab()
+	_setup_loot_tables_tab()
 	_connect_signals()
 	_refresh_item_list()
+	_refresh_loot_table_list()
 	_update_selection_state()
+	_update_loot_selection_state()
 
 
 func _get_database_path() -> String:
@@ -204,6 +258,8 @@ func _connect_signals() -> void:
 	add_button.pressed.connect(_on_add_pressed)
 	duplicate_button.pressed.connect(_on_duplicate_pressed)
 	delete_button.pressed.connect(_on_delete_pressed)
+	import_button.pressed.connect(_on_import_pressed)
+	export_button.pressed.connect(_on_export_pressed)
 	
 	# Filtri
 	search_edit.text_changed.connect(_on_search_changed)
@@ -262,6 +318,10 @@ func _connect_signals() -> void:
 	craftable_check.toggled.connect(_on_craftable_toggled)
 	if add_ingredient_button:
 		add_ingredient_button.pressed.connect(_on_add_ingredient_pressed)
+	
+	# Custom Fields
+	if add_custom_field_button:
+		add_custom_field_button.pressed.connect(_on_add_custom_field_pressed)
 
 
 # === Refresh UI ===
@@ -388,6 +448,9 @@ func _update_details_panel() -> void:
 	if selected_item.craftable:
 		_populate_ingredients_ui()
 	
+	# Custom Fields
+	_populate_custom_fields_ui()
+	
 	# Warnings
 	_update_warnings()
 	
@@ -460,6 +523,138 @@ func _on_delete_pressed() -> void:
 	_update_selection_state()
 
 
+# === Import/Export Handlers ===
+
+func _on_import_pressed() -> void:
+	# Crea popup menu per scegliere formato e modalità
+	var popup := PopupMenu.new()
+	popup.add_item("Import JSON (Skip existing)", 0)
+	popup.add_item("Import JSON (Overwrite existing)", 1)
+	popup.add_item("Import JSON (Replace all)", 2)
+	popup.add_separator()
+	popup.add_item("Import CSV (Skip existing)", 3)
+	popup.add_item("Import CSV (Overwrite existing)", 4)
+	popup.add_item("Import CSV (Replace all)", 5)
+	
+	popup.id_pressed.connect(_on_import_option_selected)
+	add_child(popup)
+	popup.popup(Rect2i(import_button.global_position + Vector2(0, import_button.size.y), Vector2i(220, 0)))
+
+
+func _on_import_option_selected(id: int) -> void:
+	var is_json := id < 3
+	var mode: ItemDatabase.ImportMode
+	
+	match id % 3:
+		0: mode = ItemDatabase.ImportMode.MERGE_SKIP
+		1: mode = ItemDatabase.ImportMode.MERGE_OVERWRITE
+		2: mode = ItemDatabase.ImportMode.REPLACE_ALL
+	
+	var dialog := EditorFileDialog.new()
+	dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
+	dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
+	
+	if is_json:
+		dialog.filters = PackedStringArray(["*.json ; JSON Files"])
+		dialog.file_selected.connect(_on_import_json_file_selected.bind(mode))
+	else:
+		dialog.filters = PackedStringArray(["*.csv ; CSV Files"])
+		dialog.file_selected.connect(_on_import_csv_file_selected.bind(mode))
+	
+	add_child(dialog)
+	dialog.popup_centered_ratio(0.6)
+
+
+func _on_import_json_file_selected(path: String, mode: ItemDatabase.ImportMode) -> void:
+	var result := database.import_from_json_file(path, mode)
+	_show_import_result(result)
+	
+	if result.imported > 0:
+		_save_database()
+		_refresh_item_list()
+
+
+func _on_import_csv_file_selected(path: String, mode: ItemDatabase.ImportMode) -> void:
+	var result := database.import_from_csv_file(path, mode)
+	_show_import_result(result)
+	
+	if result.imported > 0:
+		_save_database()
+		_refresh_item_list()
+
+
+func _show_import_result(result: Dictionary) -> void:
+	var message := "Import completed:\n"
+	message += "- Imported: %d items\n" % result.imported
+	message += "- Skipped: %d items\n" % result.skipped
+	
+	if not result.errors.is_empty():
+		message += "\nErrors:\n"
+		for error in result.errors.slice(0, 5):  # Max 5 errori mostrati
+			message += "- %s\n" % error
+		if result.errors.size() > 5:
+			message += "... and %d more errors\n" % (result.errors.size() - 5)
+	
+	var dialog := AcceptDialog.new()
+	dialog.title = "Import Result"
+	dialog.dialog_text = message
+	add_child(dialog)
+	dialog.popup_centered()
+
+
+func _on_export_pressed() -> void:
+	# Crea popup menu per scegliere formato
+	var popup := PopupMenu.new()
+	popup.add_item("Export to JSON", 0)
+	popup.add_item("Export to CSV", 1)
+	
+	popup.id_pressed.connect(_on_export_option_selected)
+	add_child(popup)
+	popup.popup(Rect2i(export_button.global_position + Vector2(0, export_button.size.y), Vector2i(150, 0)))
+
+
+func _on_export_option_selected(id: int) -> void:
+	var dialog := EditorFileDialog.new()
+	dialog.file_mode = EditorFileDialog.FILE_MODE_SAVE_FILE
+	dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
+	
+	if id == 0:
+		dialog.filters = PackedStringArray(["*.json ; JSON Files"])
+		dialog.current_file = "items_export.json"
+		dialog.file_selected.connect(_on_export_json_file_selected)
+	else:
+		dialog.filters = PackedStringArray(["*.csv ; CSV Files"])
+		dialog.current_file = "items_export.csv"
+		dialog.file_selected.connect(_on_export_csv_file_selected)
+	
+	add_child(dialog)
+	dialog.popup_centered_ratio(0.6)
+
+
+func _on_export_json_file_selected(path: String) -> void:
+	var error := database.export_to_json_file(path)
+	if error == OK:
+		var dialog := AcceptDialog.new()
+		dialog.title = "Export Successful"
+		dialog.dialog_text = "Database exported to:\n%s\n\n%d items exported." % [path, database.items.size()]
+		add_child(dialog)
+		dialog.popup_centered()
+	else:
+		push_error("[InventoryForge] Export failed: %s" % error_string(error))
+
+
+func _on_export_csv_file_selected(path: String) -> void:
+	var error := database.export_to_csv_file(path)
+	if error == OK:
+		var dialog := AcceptDialog.new()
+		dialog.title = "Export Successful"
+		dialog.dialog_text = "Database exported to:\n%s\n\n%d items exported." % [path, database.items.size()]
+		add_child(dialog)
+		dialog.popup_centered()
+	else:
+		push_error("[InventoryForge] Export failed: %s" % error_string(error))
+
+
 # === Handlers Filtri ===
 
 func _on_search_changed(_text: String) -> void:
@@ -528,6 +723,24 @@ func _on_generate_desc_key_pressed() -> void:
 
 
 func _on_icon_picker_pressed() -> void:
+	# Usa IconPickerDialog per selezionare icone dalle cartelle standard
+	var icon_dialog := IconPickerDialog.new()
+	icon_dialog.icon_selected.connect(_on_icon_selected_from_picker)
+	icon_dialog.browse_requested.connect(_open_file_dialog_for_icon)
+	
+	add_child(icon_dialog)
+	icon_dialog.popup_centered()
+
+
+func _on_icon_selected_from_picker(texture: Texture2D, path: String) -> void:
+	if selected_item:
+		selected_item.icon = texture
+		icon_preview.texture = texture
+		_mark_modified()
+
+
+func _open_file_dialog_for_icon() -> void:
+	# Fallback al file dialog standard
 	var dialog := EditorFileDialog.new()
 	dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
 	dialog.access = EditorFileDialog.ACCESS_RESOURCES
@@ -911,3 +1124,1325 @@ func _on_material_type_changed(index: int) -> void:
 	if selected_item and not is_updating_ui:
 		selected_item.material_type = index as ItemEnums.MaterialType
 		_mark_modified()
+
+
+# === Custom Fields ===
+
+func _populate_custom_fields_ui() -> void:
+	if custom_fields_container == null or selected_item == null:
+		return
+	
+	# Pulisci container
+	for child in custom_fields_container.get_children():
+		child.queue_free()
+	
+	# Crea UI per ogni custom field
+	var keys := selected_item.get_custom_keys()
+	for key in keys:
+		var value = selected_item.get_custom(key)
+		var field_ui := _create_custom_field_ui(key, value)
+		custom_fields_container.add_child(field_ui)
+
+
+func _create_custom_field_ui(key: String, value: Variant) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	
+	# Key edit
+	var key_edit := LineEdit.new()
+	key_edit.text = key
+	key_edit.placeholder_text = "field_name"
+	key_edit.custom_minimum_size = Vector2(120, 0)
+	key_edit.text_changed.connect(_on_custom_field_key_changed.bind(key))
+	row.add_child(key_edit)
+	
+	# Type selector
+	var type_option := OptionButton.new()
+	type_option.add_item("String", 0)
+	type_option.add_item("Int", 1)
+	type_option.add_item("Float", 2)
+	type_option.add_item("Bool", 3)
+	type_option.custom_minimum_size = Vector2(70, 0)
+	
+	# Determina tipo corrente
+	var current_type := 0
+	if value is int:
+		current_type = 1
+	elif value is float:
+		current_type = 2
+	elif value is bool:
+		current_type = 3
+	type_option.selected = current_type
+	type_option.item_selected.connect(_on_custom_field_type_changed.bind(key))
+	row.add_child(type_option)
+	
+	# Value editor (diverso per tipo)
+	var value_control: Control
+	
+	match current_type:
+		1:  # Int
+			var spin := SpinBox.new()
+			spin.min_value = -999999
+			spin.max_value = 999999
+			spin.value = value if value is int else 0
+			spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			spin.value_changed.connect(_on_custom_field_int_changed.bind(key))
+			value_control = spin
+		2:  # Float
+			var spin := SpinBox.new()
+			spin.min_value = -999999.0
+			spin.max_value = 999999.0
+			spin.step = 0.01
+			spin.value = value if value is float else 0.0
+			spin.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			spin.value_changed.connect(_on_custom_field_float_changed.bind(key))
+			value_control = spin
+		3:  # Bool
+			var check := CheckBox.new()
+			check.button_pressed = value if value is bool else false
+			check.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			check.toggled.connect(_on_custom_field_bool_changed.bind(key))
+			value_control = check
+		_:  # String (default)
+			var edit := LineEdit.new()
+			edit.text = str(value) if value != null else ""
+			edit.placeholder_text = "value"
+			edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			edit.text_changed.connect(_on_custom_field_string_changed.bind(key))
+			value_control = edit
+	
+	row.add_child(value_control)
+	
+	# Delete button
+	var delete_btn := Button.new()
+	delete_btn.text = "X"
+	delete_btn.tooltip_text = "Remove field"
+	delete_btn.custom_minimum_size = Vector2(28, 0)
+	delete_btn.pressed.connect(_on_remove_custom_field_pressed.bind(key))
+	row.add_child(delete_btn)
+	
+	return row
+
+
+func _on_add_custom_field_pressed() -> void:
+	if selected_item == null:
+		return
+	
+	# Genera nome unico
+	var base_name := "custom_field"
+	var counter := 1
+	var new_key := base_name
+	
+	while selected_item.has_custom(new_key):
+		new_key = "%s_%d" % [base_name, counter]
+		counter += 1
+	
+	selected_item.set_custom(new_key, "")
+	_save_database()
+	_populate_custom_fields_ui()
+
+
+func _on_remove_custom_field_pressed(key: String) -> void:
+	if selected_item == null:
+		return
+	
+	selected_item.remove_custom(key)
+	_save_database()
+	_populate_custom_fields_ui()
+
+
+func _on_custom_field_key_changed(new_key: String, old_key: String) -> void:
+	if selected_item == null or is_updating_ui:
+		return
+	
+	if new_key.is_empty() or new_key == old_key:
+		return
+	
+	# Verifica che la nuova chiave non esista già
+	if selected_item.has_custom(new_key):
+		return
+	
+	# Rinomina la chiave
+	var value = selected_item.get_custom(old_key)
+	selected_item.remove_custom(old_key)
+	selected_item.set_custom(new_key, value)
+	_save_database()
+	_populate_custom_fields_ui()
+
+
+func _on_custom_field_type_changed(type_index: int, key: String) -> void:
+	if selected_item == null or is_updating_ui:
+		return
+	
+	var old_value = selected_item.get_custom(key)
+	var new_value: Variant
+	
+	match type_index:
+		0:  # String
+			new_value = str(old_value) if old_value != null else ""
+		1:  # Int
+			if old_value is int:
+				new_value = old_value
+			elif old_value is float:
+				new_value = int(old_value)
+			elif old_value is String and old_value.is_valid_int():
+				new_value = int(old_value)
+			elif old_value is bool:
+				new_value = 1 if old_value else 0
+			else:
+				new_value = 0
+		2:  # Float
+			if old_value is float:
+				new_value = old_value
+			elif old_value is int:
+				new_value = float(old_value)
+			elif old_value is String and old_value.is_valid_float():
+				new_value = float(old_value)
+			elif old_value is bool:
+				new_value = 1.0 if old_value else 0.0
+			else:
+				new_value = 0.0
+		3:  # Bool
+			if old_value is bool:
+				new_value = old_value
+			elif old_value is int:
+				new_value = old_value != 0
+			elif old_value is float:
+				new_value = old_value != 0.0
+			elif old_value is String:
+				new_value = old_value.to_lower() in ["true", "1", "yes", "on"]
+			else:
+				new_value = false
+	
+	selected_item.set_custom(key, new_value)
+	_save_database()
+	_populate_custom_fields_ui()
+
+
+func _on_custom_field_string_changed(value: String, key: String) -> void:
+	if selected_item and not is_updating_ui:
+		selected_item.set_custom(key, value)
+		_save_database()
+
+
+func _on_custom_field_int_changed(value: float, key: String) -> void:
+	if selected_item and not is_updating_ui:
+		selected_item.set_custom(key, int(value))
+		_save_database()
+
+
+func _on_custom_field_float_changed(value: float, key: String) -> void:
+	if selected_item and not is_updating_ui:
+		selected_item.set_custom(key, value)
+		_save_database()
+
+
+func _on_custom_field_bool_changed(pressed: bool, key: String) -> void:
+	if selected_item and not is_updating_ui:
+		selected_item.set_custom(key, pressed)
+		_save_database()
+
+
+# === Statistics Dashboard ===
+
+func _setup_statistics_tab() -> void:
+	if stats_vbox == null:
+		return
+	
+	# Connetti segnale cambio tab per aggiornare statistiche
+	if main_tab_container:
+		main_tab_container.tab_changed.connect(_on_tab_changed)
+
+
+func _on_tab_changed(tab_index: int) -> void:
+	# Se siamo sulla tab Statistics (index 2), aggiorna
+	if tab_index == 2:
+		_update_statistics()
+
+
+func _update_statistics() -> void:
+	if stats_vbox == null or database == null:
+		return
+	
+	# Pulisci contenuto esistente
+	for child in stats_vbox.get_children():
+		child.queue_free()
+	
+	# Attendi un frame per assicurarsi che i nodi siano stati rimossi
+	await get_tree().process_frame
+	
+	var stats := database.get_stats()
+	
+	# === Header con Refresh ===
+	var header := HBoxContainer.new()
+	var title := Label.new()
+	title.text = "DATABASE STATISTICS"
+	title.add_theme_font_size_override("font_size", 24)
+	title.add_theme_color_override("font_color", Color(0.6, 0.8, 1, 1))
+	header.add_child(title)
+	
+	var spacer := Control.new()
+	spacer.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(spacer)
+	
+	var refresh_btn := Button.new()
+	refresh_btn.text = "Refresh"
+	refresh_btn.pressed.connect(_update_statistics)
+	header.add_child(refresh_btn)
+	
+	stats_vbox.add_child(header)
+	
+	# === Separator ===
+	var sep := HSeparator.new()
+	stats_vbox.add_child(sep)
+	
+	# === Overview Cards ===
+	var overview_container := HBoxContainer.new()
+	overview_container.add_theme_constant_override("separation", 20)
+	
+	_add_stat_card(overview_container, "Total Items", str(stats.total_items), Color.WHITE)
+	_add_stat_card(overview_container, "Ingredients", str(stats.ingredients_count), Color.CORNFLOWER_BLUE)
+	_add_stat_card(overview_container, "Craftable", str(stats.craftable_count), Color.MEDIUM_SEA_GREEN)
+	_add_stat_card(overview_container, "With Warnings", str(stats.items_with_warnings), Color.ORANGE if stats.items_with_warnings > 0 else Color.GRAY)
+	
+	stats_vbox.add_child(overview_container)
+	
+	# === Two Columns Layout ===
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 40)
+	
+	# Left Column
+	var left_col := VBoxContainer.new()
+	left_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left_col.add_theme_constant_override("separation", 20)
+	
+	# === Category Distribution ===
+	_add_section_title(left_col, "BY CATEGORY")
+	_add_category_chart(left_col, stats.category_counts, stats.total_items)
+	
+	columns.add_child(left_col)
+	
+	# Right Column
+	var right_col := VBoxContainer.new()
+	right_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right_col.add_theme_constant_override("separation", 20)
+	
+	# === Rarity Distribution ===
+	_add_section_title(right_col, "BY RARITY")
+	_add_rarity_chart(right_col, stats.rarity_counts, stats.total_items)
+	
+	columns.add_child(right_col)
+	
+	stats_vbox.add_child(columns)
+	
+	# === Material Types (if any ingredients) ===
+	if stats.ingredients_count > 0:
+		_add_section_title(stats_vbox, "MATERIAL TYPES")
+		_add_material_type_chart(stats_vbox, stats.material_type_counts, stats.ingredients_count)
+	
+	# === Issues Section ===
+	if stats.items_with_warnings > 0 or stats.duplicate_ids > 0:
+		_add_section_title(stats_vbox, "ITEM ISSUES")
+		var issues_container := VBoxContainer.new()
+		
+		if stats.duplicate_ids > 0:
+			var dup_label := Label.new()
+			dup_label.text = "  Duplicate IDs: %d" % stats.duplicate_ids
+			dup_label.add_theme_color_override("font_color", Color.INDIAN_RED)
+			issues_container.add_child(dup_label)
+		
+		if stats.items_with_warnings > 0:
+			var warn_label := Label.new()
+			warn_label.text = "  Items with warnings: %d" % stats.items_with_warnings
+			warn_label.add_theme_color_override("font_color", Color.ORANGE)
+			issues_container.add_child(warn_label)
+		
+		stats_vbox.add_child(issues_container)
+	
+	# === LOOT TABLES SECTION ===
+	_add_loot_table_statistics(stats_vbox)
+
+
+func _add_stat_card(container: HBoxContainer, title: String, value: String, color: Color) -> void:
+	var card := PanelContainer.new()
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 5)
+	
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 15)
+	margin.add_theme_constant_override("margin_right", 15)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_bottom", 10)
+	
+	var value_label := Label.new()
+	value_label.text = value
+	value_label.add_theme_font_size_override("font_size", 28)
+	value_label.add_theme_color_override("font_color", color)
+	value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(value_label)
+	
+	var title_label := Label.new()
+	title_label.text = title
+	title_label.add_theme_font_size_override("font_size", 12)
+	title_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7, 1))
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	vbox.add_child(title_label)
+	
+	margin.add_child(vbox)
+	card.add_child(margin)
+	container.add_child(card)
+
+
+func _add_section_title(container: VBoxContainer, title: String) -> void:
+	var label := Label.new()
+	label.text = title
+	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_color_override("font_color", Color(0.6, 0.8, 1, 1))
+	container.add_child(label)
+
+
+func _add_category_chart(container: VBoxContainer, counts: Dictionary, total: int) -> void:
+	var chart_container := VBoxContainer.new()
+	chart_container.add_theme_constant_override("separation", 6)
+	
+	for category in ItemEnums.Category.values():
+		var count: int = counts.get(category, 0)
+		var category_name: String = ItemEnums.Category.keys()[category]
+		_add_progress_row(chart_container, category_name.capitalize(), count, total, Color.CORNFLOWER_BLUE)
+	
+	container.add_child(chart_container)
+
+
+func _add_rarity_chart(container: VBoxContainer, counts: Dictionary, total: int) -> void:
+	var chart_container := VBoxContainer.new()
+	chart_container.add_theme_constant_override("separation", 6)
+	
+	for rarity in ItemEnums.Rarity.values():
+		var count: int = counts.get(rarity, 0)
+		var rarity_name: String = ItemEnums.Rarity.keys()[rarity]
+		var color := ItemEnums.get_rarity_color(rarity)
+		_add_progress_row(chart_container, rarity_name.capitalize(), count, total, color)
+	
+	container.add_child(chart_container)
+
+
+func _add_material_type_chart(container: VBoxContainer, counts: Dictionary, total: int) -> void:
+	var chart_container := HBoxContainer.new()
+	chart_container.add_theme_constant_override("separation", 20)
+	
+	var left_col := VBoxContainer.new()
+	left_col.add_theme_constant_override("separation", 6)
+	left_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	
+	var right_col := VBoxContainer.new()
+	right_col.add_theme_constant_override("separation", 6)
+	right_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	
+	var i := 0
+	for mat_type in ItemEnums.MaterialType.values():
+		if mat_type == ItemEnums.MaterialType.NONE:
+			continue
+		var count: int = counts.get(mat_type, 0)
+		if count == 0:
+			continue
+		var mat_name: String = ItemEnums.MaterialType.keys()[mat_type]
+		var target_col := left_col if i % 2 == 0 else right_col
+		_add_progress_row(target_col, mat_name.capitalize(), count, total, Color.MEDIUM_PURPLE)
+		i += 1
+	
+	chart_container.add_child(left_col)
+	chart_container.add_child(right_col)
+	container.add_child(chart_container)
+
+
+func _add_progress_row(container: VBoxContainer, label_text: String, value: int, max_value: int, color: Color) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 10)
+	
+	var label := Label.new()
+	label.text = label_text
+	label.custom_minimum_size = Vector2(100, 0)
+	row.add_child(label)
+	
+	var progress := ProgressBar.new()
+	progress.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	progress.custom_minimum_size = Vector2(150, 20)
+	progress.max_value = max_value if max_value > 0 else 1
+	progress.value = value
+	progress.show_percentage = false
+	
+	# Stilizza la progress bar
+	var style := StyleBoxFlat.new()
+	style.bg_color = color
+	style.corner_radius_top_left = 3
+	style.corner_radius_top_right = 3
+	style.corner_radius_bottom_left = 3
+	style.corner_radius_bottom_right = 3
+	progress.add_theme_stylebox_override("fill", style)
+	
+	row.add_child(progress)
+	
+	var count_label := Label.new()
+	var percentage := (float(value) / float(max_value) * 100.0) if max_value > 0 else 0.0
+	count_label.text = "%d (%d%%)" % [value, int(percentage)]
+	count_label.custom_minimum_size = Vector2(80, 0)
+	count_label.add_theme_color_override("font_color", Color(0.7, 0.7, 0.7, 1))
+	row.add_child(count_label)
+	
+	container.add_child(row)
+
+
+func _add_loot_table_statistics(container: VBoxContainer) -> void:
+	if loot_database == null:
+		return
+	
+	var loot_stats := loot_database.get_stats()
+	
+	# === Separator ===
+	var sep := HSeparator.new()
+	sep.add_theme_constant_override("separation", 20)
+	container.add_child(sep)
+	
+	# === Loot Tables Header ===
+	var loot_header := Label.new()
+	loot_header.text = "LOOT TABLES STATISTICS"
+	loot_header.add_theme_font_size_override("font_size", 24)
+	loot_header.add_theme_color_override("font_color", Color(0.6, 0.8, 1, 1))
+	container.add_child(loot_header)
+	
+	# === Separator ===
+	var sep2 := HSeparator.new()
+	container.add_child(sep2)
+	
+	# === Overview Cards ===
+	var overview_container := HBoxContainer.new()
+	overview_container.add_theme_constant_override("separation", 20)
+	
+	_add_stat_card(overview_container, "Total Tables", str(loot_stats.total_tables), Color.WHITE)
+	_add_stat_card(overview_container, "Total Entries", str(loot_stats.total_entries), Color.CORNFLOWER_BLUE)
+	_add_stat_card(overview_container, "Avg Entries", "%.1f" % loot_stats.avg_entries_per_table, Color.MEDIUM_SEA_GREEN)
+	_add_stat_card(overview_container, "With Sub-Tables", str(loot_stats.tables_with_sub_tables), Color.MEDIUM_PURPLE)
+	
+	container.add_child(overview_container)
+	
+	# === Two Columns Layout ===
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 40)
+	
+	# Left Column - Rarity Tier Distribution
+	var left_col := VBoxContainer.new()
+	left_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left_col.add_theme_constant_override("separation", 20)
+	
+	_add_section_title(left_col, "BY RARITY TIER")
+	_add_rarity_tier_chart(left_col, loot_stats.rarity_tier_counts, loot_stats.total_tables)
+	
+	columns.add_child(left_col)
+	
+	# Right Column - Issues
+	var right_col := VBoxContainer.new()
+	right_col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right_col.add_theme_constant_override("separation", 20)
+	
+	# Loot Table Issues
+	if loot_stats.tables_with_warnings > 0 or loot_stats.duplicate_ids > 0 or loot_stats.empty_tables > 0:
+		_add_section_title(right_col, "LOOT TABLE ISSUES")
+		var issues_container := VBoxContainer.new()
+		issues_container.add_theme_constant_override("separation", 4)
+		
+		if loot_stats.duplicate_ids > 0:
+			var dup_label := Label.new()
+			dup_label.text = "  Duplicate IDs: %d" % loot_stats.duplicate_ids
+			dup_label.add_theme_color_override("font_color", Color.INDIAN_RED)
+			issues_container.add_child(dup_label)
+		
+		if loot_stats.empty_tables > 0:
+			var empty_label := Label.new()
+			empty_label.text = "  Empty tables (no entries): %d" % loot_stats.empty_tables
+			empty_label.add_theme_color_override("font_color", Color.ORANGE)
+			issues_container.add_child(empty_label)
+		
+		if loot_stats.tables_with_warnings > 0:
+			var warn_label := Label.new()
+			warn_label.text = "  Tables with warnings: %d" % loot_stats.tables_with_warnings
+			warn_label.add_theme_color_override("font_color", Color.ORANGE)
+			issues_container.add_child(warn_label)
+		
+		right_col.add_child(issues_container)
+	else:
+		_add_section_title(right_col, "STATUS")
+		var ok_label := Label.new()
+		ok_label.text = "  All loot tables are valid"
+		ok_label.add_theme_color_override("font_color", Color.MEDIUM_SEA_GREEN)
+		right_col.add_child(ok_label)
+	
+	columns.add_child(right_col)
+	container.add_child(columns)
+
+
+func _add_rarity_tier_chart(container: VBoxContainer, counts: Dictionary, total: int) -> void:
+	var chart_container := VBoxContainer.new()
+	chart_container.add_theme_constant_override("separation", 6)
+	
+	# Colori per i rarity tier
+	var tier_colors := {
+		LootTable.RarityTier.CUSTOM: Color(0.5, 0.5, 0.5, 1),
+		LootTable.RarityTier.COMMON: Color(0.8, 0.8, 0.8, 1),
+		LootTable.RarityTier.UNCOMMON: Color(0.3, 0.8, 0.3, 1),
+		LootTable.RarityTier.RARE: Color(0.3, 0.5, 1.0, 1),
+		LootTable.RarityTier.EPIC: Color(0.6, 0.3, 0.9, 1),
+		LootTable.RarityTier.LEGENDARY: Color(1.0, 0.6, 0.1, 1),
+	}
+	
+	for tier in LootTable.RarityTier.values():
+		var count: int = counts.get(tier, 0)
+		var tier_name: String = LootTable.get_rarity_name(tier)
+		var color: Color = tier_colors.get(tier, Color.WHITE)
+		_add_progress_row(chart_container, tier_name, count, total, color)
+	
+	container.add_child(chart_container)
+
+
+# === Loot Tables Tab ===
+
+func _get_loot_database_path() -> String:
+	return Settings.get_loot_database_path()
+
+
+func _load_loot_database() -> void:
+	var db_path := _get_loot_database_path()
+	
+	if ResourceLoader.exists(db_path):
+		loot_database = load(db_path) as LootTableDatabase
+	
+	if loot_database == null:
+		loot_database = LootTableDatabase.new()
+		_save_loot_database()
+
+
+func _save_loot_database() -> void:
+	if loot_database == null:
+		push_error("[InventoryForge] Cannot save: loot database is null!")
+		return
+	
+	var db_path := _get_loot_database_path()
+	var error := ResourceSaver.save(loot_database, db_path)
+	if error != OK:
+		push_error("[InventoryForge] Failed to save loot database: %s" % error_string(error))
+
+
+func _setup_loot_tables_tab() -> void:
+	if add_loot_table_button == null:
+		return
+	
+	# Connetti segnali dei controlli loot tables
+	add_loot_table_button.pressed.connect(_on_add_loot_table_pressed)
+	duplicate_loot_table_button.pressed.connect(_on_duplicate_loot_table_pressed)
+	delete_loot_table_button.pressed.connect(_on_delete_loot_table_pressed)
+	loot_search_edit.text_changed.connect(_on_loot_search_changed)
+	loot_table_list.item_selected.connect(_on_loot_table_selected)
+	
+	# Details
+	loot_id_edit.text_changed.connect(_on_loot_id_changed)
+	loot_name_edit.text_changed.connect(_on_loot_name_changed)
+	loot_desc_edit.text_changed.connect(_on_loot_desc_changed)
+	min_drops_spinbox.value_changed.connect(_on_min_drops_changed)
+	max_drops_spinbox.value_changed.connect(_on_max_drops_changed)
+	empty_chance_spinbox.value_changed.connect(_on_empty_chance_changed)
+	allow_duplicates_check.toggled.connect(_on_allow_duplicates_toggled)
+	add_entry_button.pressed.connect(_on_add_entry_pressed)
+	test_roll_button.pressed.connect(_on_test_roll_pressed)
+	
+	# Rarity Preset
+	if rarity_tier_option:
+		rarity_tier_option.item_selected.connect(_on_rarity_tier_changed)
+	
+	# Sub-Tables
+	if add_sub_table_button:
+		add_sub_table_button.pressed.connect(_on_add_sub_table_pressed)
+	
+	# Import/Export
+	if import_loot_button:
+		import_loot_button.pressed.connect(_on_import_loot_pressed)
+	if export_loot_button:
+		export_loot_button.pressed.connect(_on_export_loot_pressed)
+
+
+func _refresh_loot_table_list() -> void:
+	if loot_table_list == null or loot_database == null:
+		return
+	
+	loot_table_list.clear()
+	
+	var search_query := loot_search_edit.text.strip_edges() if loot_search_edit else ""
+	filtered_loot_tables = loot_database.search_tables(search_query)
+	
+	for table in filtered_loot_tables:
+		if table == null:
+			continue
+		
+		var display_text := "[%s] %s" % [table.id, table.name if not table.name.is_empty() else "(unnamed)"]
+		loot_table_list.add_item(display_text)
+	
+	# Aggiorna contatore
+	if loot_table_count_label:
+		loot_table_count_label.text = "%d tables" % loot_database.tables.size()
+	
+	# Riseleziona se possibile
+	if selected_loot_table:
+		var idx := filtered_loot_tables.find(selected_loot_table)
+		if idx >= 0:
+			loot_table_list.select(idx)
+
+
+func _update_loot_selection_state() -> void:
+	if loot_no_selection_label == null:
+		return
+	
+	var has_selection := selected_loot_table != null
+	
+	loot_no_selection_label.visible = not has_selection
+	if loot_details_scroll:
+		loot_details_scroll.visible = has_selection
+	
+	if duplicate_loot_table_button:
+		duplicate_loot_table_button.disabled = not has_selection
+	if delete_loot_table_button:
+		delete_loot_table_button.disabled = not has_selection
+	
+	if has_selection:
+		_update_loot_details_panel()
+
+
+func _update_loot_details_panel() -> void:
+	if selected_loot_table == null:
+		return
+	
+	is_updating_ui = true
+	
+	# Header
+	if loot_table_name_label:
+		var display_name := selected_loot_table.name if not selected_loot_table.name.is_empty() else selected_loot_table.id
+		loot_table_name_label.text = display_name
+	
+	# Basic info
+	if loot_id_edit:
+		loot_id_edit.text = selected_loot_table.id
+	if loot_name_edit:
+		loot_name_edit.text = selected_loot_table.name
+	if loot_desc_edit:
+		loot_desc_edit.text = selected_loot_table.description
+	
+	# Rarity Preset
+	if rarity_tier_option:
+		rarity_tier_option.selected = selected_loot_table.rarity_tier
+		_update_rarity_desc_label()
+	
+	# Settings
+	if min_drops_spinbox:
+		min_drops_spinbox.value = selected_loot_table.min_drops
+	if max_drops_spinbox:
+		max_drops_spinbox.value = selected_loot_table.max_drops
+	if empty_chance_spinbox:
+		empty_chance_spinbox.value = selected_loot_table.empty_chance * 100.0
+	if allow_duplicates_check:
+		allow_duplicates_check.button_pressed = selected_loot_table.allow_duplicates
+	
+	# Entries
+	_populate_loot_entries_ui()
+	
+	# Sub-Tables
+	_populate_sub_tables_ui()
+	
+	# Reset test result
+	if test_result_label:
+		test_result_label.text = "[i]Click 'Roll!' to test the loot table[/i]"
+	
+	is_updating_ui = false
+
+
+func _populate_loot_entries_ui() -> void:
+	if loot_entries_container == null or selected_loot_table == null:
+		return
+	
+	# Pulisci container
+	for child in loot_entries_container.get_children():
+		child.queue_free()
+	
+	# Crea UI per ogni entry
+	for i in range(selected_loot_table.entries.size()):
+		var entry := selected_loot_table.entries[i]
+		if entry == null:
+			continue
+		
+		var entry_ui := _create_loot_entry_ui(entry, i)
+		loot_entries_container.add_child(entry_ui)
+
+
+func _create_loot_entry_ui(entry: LootEntry, index: int) -> PanelContainer:
+	var panel := PanelContainer.new()
+	
+	var margin := MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	
+	var vbox := VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 6)
+	
+	# Row 1: Item selector + Delete
+	var row1 := HBoxContainer.new()
+	row1.add_theme_constant_override("separation", 8)
+	
+	var item_option := OptionButton.new()
+	item_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	item_option.add_item("-- Select Item --", -1)
+	
+	# Popola con items dal database
+	if database:
+		for item in database.items:
+			if item:
+				var item_name := item.get_translated_name()
+				item_option.add_item("[%d] %s" % [item.id, item_name], item.id)
+	
+	# Seleziona l'item corrente
+	if entry.item:
+		for j in range(item_option.item_count):
+			if item_option.get_item_id(j) == entry.item.id:
+				item_option.select(j)
+				break
+	
+	item_option.item_selected.connect(_on_entry_item_changed.bind(index, item_option))
+	row1.add_child(item_option)
+	
+	var delete_btn := Button.new()
+	delete_btn.text = "X"
+	delete_btn.tooltip_text = "Remove entry"
+	delete_btn.custom_minimum_size = Vector2(30, 0)
+	delete_btn.pressed.connect(_on_remove_entry_pressed.bind(index))
+	row1.add_child(delete_btn)
+	
+	vbox.add_child(row1)
+	
+	# Row 2: Weight + Quantity range
+	var row2 := HBoxContainer.new()
+	row2.add_theme_constant_override("separation", 8)
+	
+	var weight_label := Label.new()
+	weight_label.text = "Weight:"
+	row2.add_child(weight_label)
+	
+	var weight_spin := SpinBox.new()
+	weight_spin.min_value = 0.1
+	weight_spin.max_value = 1000.0
+	weight_spin.step = 0.1
+	weight_spin.value = entry.weight
+	weight_spin.custom_minimum_size = Vector2(70, 0)
+	weight_spin.value_changed.connect(_on_entry_weight_changed.bind(index))
+	row2.add_child(weight_spin)
+	
+	var qty_label := Label.new()
+	qty_label.text = "  Qty:"
+	row2.add_child(qty_label)
+	
+	var min_qty_spin := SpinBox.new()
+	min_qty_spin.min_value = 1
+	min_qty_spin.max_value = 999
+	min_qty_spin.value = entry.min_quantity
+	min_qty_spin.custom_minimum_size = Vector2(60, 0)
+	min_qty_spin.value_changed.connect(_on_entry_min_qty_changed.bind(index))
+	row2.add_child(min_qty_spin)
+	
+	var to_label := Label.new()
+	to_label.text = "-"
+	row2.add_child(to_label)
+	
+	var max_qty_spin := SpinBox.new()
+	max_qty_spin.min_value = 1
+	max_qty_spin.max_value = 999
+	max_qty_spin.value = entry.max_quantity
+	max_qty_spin.custom_minimum_size = Vector2(60, 0)
+	max_qty_spin.value_changed.connect(_on_entry_max_qty_changed.bind(index))
+	row2.add_child(max_qty_spin)
+	
+	# Probability display
+	var prob_label := Label.new()
+	var prob := selected_loot_table.get_entry_probability(entry)
+	prob_label.text = "  (%.1f%%)" % prob
+	prob_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.6, 1))
+	row2.add_child(prob_label)
+	
+	vbox.add_child(row2)
+	
+	margin.add_child(vbox)
+	panel.add_child(margin)
+	
+	return panel
+
+
+func _mark_loot_modified() -> void:
+	if is_updating_ui:
+		return
+	
+	_save_loot_database()
+	_refresh_loot_table_list()
+	_update_loot_details_panel()
+
+
+# === Loot Table Handlers ===
+
+func _on_add_loot_table_pressed() -> void:
+	var new_table := loot_database.create_new_table()
+	selected_loot_table = new_table
+	_save_loot_database()
+	_refresh_loot_table_list()
+	_update_loot_selection_state()
+
+
+func _on_duplicate_loot_table_pressed() -> void:
+	if selected_loot_table == null:
+		return
+	
+	var new_table := loot_database.duplicate_table(selected_loot_table)
+	selected_loot_table = new_table
+	_save_loot_database()
+	_refresh_loot_table_list()
+	_update_loot_selection_state()
+
+
+func _on_delete_loot_table_pressed() -> void:
+	if selected_loot_table == null:
+		return
+	
+	loot_database.remove_table(selected_loot_table)
+	selected_loot_table = null
+	_save_loot_database()
+	_refresh_loot_table_list()
+	_update_loot_selection_state()
+
+
+func _on_loot_search_changed(_text: String) -> void:
+	_refresh_loot_table_list()
+
+
+func _on_loot_table_selected(index: int) -> void:
+	if index < 0 or index >= filtered_loot_tables.size():
+		selected_loot_table = null
+	else:
+		selected_loot_table = filtered_loot_tables[index]
+	
+	_update_loot_selection_state()
+
+
+func _on_loot_id_changed(text: String) -> void:
+	if selected_loot_table and not is_updating_ui:
+		selected_loot_table.id = text
+		_mark_loot_modified()
+
+
+func _on_loot_name_changed(text: String) -> void:
+	if selected_loot_table and not is_updating_ui:
+		selected_loot_table.name = text
+		_mark_loot_modified()
+
+
+func _on_loot_desc_changed() -> void:
+	if selected_loot_table and not is_updating_ui and loot_desc_edit:
+		selected_loot_table.description = loot_desc_edit.text
+		_save_loot_database()
+
+
+func _on_min_drops_changed(value: float) -> void:
+	if selected_loot_table and not is_updating_ui:
+		selected_loot_table.min_drops = int(value)
+		_save_loot_database()
+
+
+func _on_max_drops_changed(value: float) -> void:
+	if selected_loot_table and not is_updating_ui:
+		selected_loot_table.max_drops = int(value)
+		_save_loot_database()
+
+
+func _on_empty_chance_changed(value: float) -> void:
+	if selected_loot_table and not is_updating_ui:
+		selected_loot_table.empty_chance = value / 100.0
+		_save_loot_database()
+
+
+func _on_allow_duplicates_toggled(pressed: bool) -> void:
+	if selected_loot_table and not is_updating_ui:
+		selected_loot_table.allow_duplicates = pressed
+		_save_loot_database()
+
+
+func _on_add_entry_pressed() -> void:
+	if selected_loot_table == null:
+		return
+	
+	var new_entry := LootEntry.new()
+	selected_loot_table.add_entry(new_entry)
+	_mark_loot_modified()
+
+
+func _on_remove_entry_pressed(index: int) -> void:
+	if selected_loot_table == null:
+		return
+	
+	selected_loot_table.remove_entry_at(index)
+	_mark_loot_modified()
+
+
+func _on_entry_item_changed(option_index: int, entry_index: int, item_option: OptionButton) -> void:
+	if selected_loot_table == null or is_updating_ui:
+		return
+	
+	var entry := selected_loot_table.get_entry(entry_index)
+	if entry == null:
+		return
+	
+	if item_option == null:
+		return
+	
+	var item_id := item_option.get_item_id(option_index)
+	if item_id < 0:
+		entry.item = null
+	else:
+		entry.item = database.get_item_by_id(item_id)
+	
+	_mark_loot_modified()
+
+
+func _on_entry_weight_changed(value: float, entry_index: int) -> void:
+	if selected_loot_table == null or is_updating_ui:
+		return
+	
+	var entry := selected_loot_table.get_entry(entry_index)
+	if entry:
+		entry.weight = value
+		_mark_loot_modified()
+
+
+func _on_entry_min_qty_changed(value: float, entry_index: int) -> void:
+	if selected_loot_table == null or is_updating_ui:
+		return
+	
+	var entry := selected_loot_table.get_entry(entry_index)
+	if entry:
+		entry.min_quantity = int(value)
+		_save_loot_database()
+
+
+func _on_entry_max_qty_changed(value: float, entry_index: int) -> void:
+	if selected_loot_table == null or is_updating_ui:
+		return
+	
+	var entry := selected_loot_table.get_entry(entry_index)
+	if entry:
+		entry.max_quantity = int(value)
+		_save_loot_database()
+
+
+func _on_test_roll_pressed() -> void:
+	if selected_loot_table == null or test_result_label == null:
+		return
+	
+	# Usa roll_with_sub_tables per includere le sub-tables
+	var result := selected_loot_table.roll_with_sub_tables(loot_database)
+	
+	if result.is_empty():
+		test_result_label.text = "[color=gray][i]Nothing dropped![/i][/color]"
+	else:
+		var text := "[color=lime]Drops:[/color]\n"
+		for item_data in result.items:
+			var item: ItemDefinition = item_data.item
+			var qty: int = item_data.quantity
+			var item_name := item.get_translated_name() if item else "???"
+			text += "  - %s x%d\n" % [item_name, qty]
+		
+		# Mostra info sulle sub-tables se presenti
+		if selected_loot_table.has_sub_tables():
+			text += "\n[color=cyan][i](Includes sub-tables)[/i][/color]"
+		
+		test_result_label.text = text
+
+
+# === Rarity Preset Handlers ===
+
+func _on_rarity_tier_changed(index: int) -> void:
+	if selected_loot_table == null or is_updating_ui:
+		return
+	
+	selected_loot_table.rarity_tier = index as LootTable.RarityTier
+	_update_rarity_desc_label()
+	
+	# Aggiorna anche i valori visualizzati negli spinbox
+	is_updating_ui = true
+	if min_drops_spinbox:
+		min_drops_spinbox.value = selected_loot_table.min_drops
+	if max_drops_spinbox:
+		max_drops_spinbox.value = selected_loot_table.max_drops
+	if empty_chance_spinbox:
+		empty_chance_spinbox.value = selected_loot_table.empty_chance * 100.0
+	is_updating_ui = false
+	
+	_save_loot_database()
+
+
+func _update_rarity_desc_label() -> void:
+	if rarity_desc_label == null or selected_loot_table == null:
+		return
+	
+	var tier := selected_loot_table.rarity_tier
+	if tier == LootTable.RarityTier.CUSTOM:
+		rarity_desc_label.text = "Manual configuration - adjust drop settings below"
+	else:
+		var desc := LootTable.get_rarity_description(tier)
+		rarity_desc_label.text = "Preset applied: %s" % desc
+
+
+# === Sub-Tables Handlers ===
+
+func _populate_sub_tables_ui() -> void:
+	if sub_tables_container == null or selected_loot_table == null:
+		return
+	
+	# Pulisci container
+	for child in sub_tables_container.get_children():
+		child.queue_free()
+	
+	# Se non ci sono sub-tables, mostra messaggio
+	if selected_loot_table.sub_table_ids.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No sub-tables configured"
+		empty_label.add_theme_color_override("font_color", Color(0.5, 0.5, 0.5, 1))
+		sub_tables_container.add_child(empty_label)
+		return
+	
+	# Crea una riga per ogni sub-table
+	for i in range(selected_loot_table.sub_table_ids.size()):
+		var sub_id: String = selected_loot_table.sub_table_ids[i]
+		var row := _create_sub_table_row(sub_id, i)
+		sub_tables_container.add_child(row)
+
+
+func _create_sub_table_row(sub_id: String, index: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	
+	# Dropdown per selezionare la tabella
+	var table_option := OptionButton.new()
+	table_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	table_option.add_item("-- Select Table --", -1)
+	
+	# Popola con tutte le tabelle disponibili (esclusa quella corrente)
+	var selected_idx := 0
+	if loot_database:
+		for table in loot_database.tables:
+			if table and table.id != selected_loot_table.id:  # Escludi self-reference
+				var display := "[%s] %s" % [table.id, table.name if not table.name.is_empty() else "(unnamed)"]
+				table_option.add_item(display)
+				# Salva l'ID come metadata
+				table_option.set_item_metadata(table_option.item_count - 1, table.id)
+				
+				# Se corrisponde all'ID corrente, selezionalo
+				if table.id == sub_id:
+					selected_idx = table_option.item_count - 1
+	
+	table_option.selected = selected_idx
+	table_option.item_selected.connect(_on_sub_table_changed.bind(index, table_option))
+	row.add_child(table_option)
+	
+	# Indicatore di stato della sub-table
+	var status_label := Label.new()
+	var sub_table := loot_database.get_table_by_id(sub_id) if loot_database and not sub_id.is_empty() else null
+	if sub_table:
+		var tier_name := LootTable.get_rarity_name(sub_table.rarity_tier)
+		status_label.text = "[%s]" % tier_name
+		status_label.add_theme_color_override("font_color", Color(0.5, 0.8, 0.5, 1))
+	else:
+		status_label.text = "[Not found]"
+		status_label.add_theme_color_override("font_color", Color(1, 0.5, 0.5, 1))
+	status_label.custom_minimum_size = Vector2(80, 0)
+	row.add_child(status_label)
+	
+	# Bottone rimuovi
+	var remove_btn := Button.new()
+	remove_btn.text = "X"
+	remove_btn.tooltip_text = "Remove sub-table"
+	remove_btn.custom_minimum_size = Vector2(30, 0)
+	remove_btn.pressed.connect(_on_remove_sub_table_pressed.bind(index))
+	row.add_child(remove_btn)
+	
+	return row
+
+
+func _on_add_sub_table_pressed() -> void:
+	if selected_loot_table == null:
+		return
+	
+	# Aggiungi un nuovo slot vuoto
+	selected_loot_table.sub_table_ids.append("")
+	_populate_sub_tables_ui()
+	_save_loot_database()
+
+
+func _on_remove_sub_table_pressed(index: int) -> void:
+	if selected_loot_table == null or index < 0 or index >= selected_loot_table.sub_table_ids.size():
+		return
+	
+	selected_loot_table.sub_table_ids.remove_at(index)
+	_populate_sub_tables_ui()
+	_save_loot_database()
+
+
+func _on_sub_table_changed(option_index: int, row_index: int, table_option: OptionButton) -> void:
+	if selected_loot_table == null or is_updating_ui:
+		return
+	
+	if row_index < 0 or row_index >= selected_loot_table.sub_table_ids.size():
+		return
+	
+	# Ottieni l'ID dalla metadata
+	var new_id := ""
+	if option_index > 0:  # 0 è "-- Select Table --"
+		new_id = table_option.get_item_metadata(option_index)
+	
+	selected_loot_table.sub_table_ids[row_index] = new_id
+	_populate_sub_tables_ui()
+	_save_loot_database()
+
+
+# === Loot Tables Import/Export Handlers ===
+
+func _on_import_loot_pressed() -> void:
+	# Crea popup menu per scegliere formato e modalità
+	var popup := PopupMenu.new()
+	popup.add_item("Import JSON (Skip existing)", 0)
+	popup.add_item("Import JSON (Overwrite existing)", 1)
+	popup.add_item("Import JSON (Replace all)", 2)
+	popup.add_separator()
+	popup.add_item("Import CSV (Skip existing)", 3)
+	popup.add_item("Import CSV (Overwrite existing)", 4)
+	popup.add_item("Import CSV (Replace all)", 5)
+	
+	popup.id_pressed.connect(_on_import_loot_option_selected)
+	add_child(popup)
+	popup.popup(Rect2i(import_loot_button.global_position + Vector2(0, import_loot_button.size.y), Vector2i(220, 0)))
+
+
+func _on_import_loot_option_selected(id: int) -> void:
+	var is_json := id < 3
+	var mode: LootTableDatabase.ImportMode
+	
+	match id % 3:
+		0: mode = LootTableDatabase.ImportMode.MERGE_SKIP
+		1: mode = LootTableDatabase.ImportMode.MERGE_OVERWRITE
+		2: mode = LootTableDatabase.ImportMode.REPLACE_ALL
+	
+	var dialog := EditorFileDialog.new()
+	dialog.file_mode = EditorFileDialog.FILE_MODE_OPEN_FILE
+	dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
+	
+	if is_json:
+		dialog.filters = PackedStringArray(["*.json ; JSON Files"])
+		dialog.file_selected.connect(_on_import_loot_json_file_selected.bind(mode))
+	else:
+		dialog.filters = PackedStringArray(["*.csv ; CSV Files"])
+		dialog.file_selected.connect(_on_import_loot_csv_file_selected.bind(mode))
+	
+	add_child(dialog)
+	dialog.popup_centered_ratio(0.6)
+
+
+func _on_import_loot_json_file_selected(path: String, mode: LootTableDatabase.ImportMode) -> void:
+	var result := loot_database.import_from_json_file(path, mode, database)
+	_show_import_loot_result(result)
+	
+	if result.imported > 0:
+		_save_loot_database()
+		_refresh_loot_table_list()
+
+
+func _on_import_loot_csv_file_selected(path: String, mode: LootTableDatabase.ImportMode) -> void:
+	var result := loot_database.import_from_csv_file(path, mode, database)
+	_show_import_loot_result(result)
+	
+	if result.imported > 0:
+		_save_loot_database()
+		_refresh_loot_table_list()
+
+
+func _show_import_loot_result(result: Dictionary) -> void:
+	var message := "Import completed:\n"
+	message += "- Imported: %d tables\n" % result.imported
+	message += "- Skipped: %d tables\n" % result.skipped
+	
+	if not result.errors.is_empty():
+		message += "\nErrors:\n"
+		for error in result.errors.slice(0, 5):  # Max 5 errori mostrati
+			message += "- %s\n" % error
+		if result.errors.size() > 5:
+			message += "... and %d more errors\n" % (result.errors.size() - 5)
+	
+	var dialog := AcceptDialog.new()
+	dialog.title = "Import Result"
+	dialog.dialog_text = message
+	add_child(dialog)
+	dialog.popup_centered()
+
+
+func _on_export_loot_pressed() -> void:
+	# Crea popup menu per scegliere formato
+	var popup := PopupMenu.new()
+	popup.add_item("Export to JSON", 0)
+	popup.add_item("Export to CSV", 1)
+	
+	popup.id_pressed.connect(_on_export_loot_option_selected)
+	add_child(popup)
+	popup.popup(Rect2i(export_loot_button.global_position + Vector2(0, export_loot_button.size.y), Vector2i(150, 0)))
+
+
+func _on_export_loot_option_selected(id: int) -> void:
+	var dialog := EditorFileDialog.new()
+	dialog.file_mode = EditorFileDialog.FILE_MODE_SAVE_FILE
+	dialog.access = EditorFileDialog.ACCESS_FILESYSTEM
+	
+	if id == 0:
+		dialog.filters = PackedStringArray(["*.json ; JSON Files"])
+		dialog.current_file = "loot_tables_export.json"
+		dialog.file_selected.connect(_on_export_loot_json_file_selected)
+	else:
+		dialog.filters = PackedStringArray(["*.csv ; CSV Files"])
+		dialog.current_file = "loot_tables_export.csv"
+		dialog.file_selected.connect(_on_export_loot_csv_file_selected)
+	
+	add_child(dialog)
+	dialog.popup_centered_ratio(0.6)
+
+
+func _on_export_loot_json_file_selected(path: String) -> void:
+	var error := loot_database.export_to_json_file(path)
+	if error == OK:
+		var dialog := AcceptDialog.new()
+		dialog.title = "Export Successful"
+		dialog.dialog_text = "Loot tables exported to:\n%s\n\n%d tables exported." % [path, loot_database.tables.size()]
+		add_child(dialog)
+		dialog.popup_centered()
+	else:
+		push_error("[InventoryForge] Export failed: %s" % error_string(error))
+
+
+func _on_export_loot_csv_file_selected(path: String) -> void:
+	var error := loot_database.export_to_csv_file(path)
+	if error == OK:
+		var dialog := AcceptDialog.new()
+		dialog.title = "Export Successful"
+		dialog.dialog_text = "Loot tables exported to:\n%s\n\n%d tables exported." % [path, loot_database.tables.size()]
+		add_child(dialog)
+		dialog.popup_centered()
+	else:
+		push_error("[InventoryForge] Export failed: %s" % error_string(error))

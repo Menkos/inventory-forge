@@ -2,6 +2,7 @@
 .godot/
 .idea/
 AGENTS.md
+FUTURE_FEATURES.md
 /android/
 addons/*/.import
 addons/*/.godot
