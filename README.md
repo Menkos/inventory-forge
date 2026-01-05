@@ -6,7 +6,7 @@
 
 **Visual item database editor with multilingual support for RPG and adventure games**
 
-Created by **Menkos** | License: MIT | Version: 1.2.1
+Created by **Menkos** | License: MIT | Version: 1.2.0
 
 ---
 
