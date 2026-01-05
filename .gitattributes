@@ -1,0 +1,13 @@
+# Git attributes for export (per AssetLib)
+# Escludi file non necessari dall'archivio di distribuzione
+
+# Includi solo la cartella addon
+/addons/ export-ignore
+/addons/** export-ignore
+!/addons/inventory_forge/ export-ignore
+!/addons/inventory_forge/** export-ignore
+
+# Ignora tutto il resto
+/* export-ignore
+!/addons/ export-ignore
+!/addons/inventory_forge/ export-ignore
