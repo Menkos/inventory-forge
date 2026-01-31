@@ -129,6 +129,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 allow_reselect = true
+fixed_icon_size = Vector2i(32, 32)
 item_count = 5
 item_0/text = "[1] ITEM_POTION_NAME"
 item_0/icon = ExtResource("2_5v7db")
@@ -915,11 +916,14 @@ unique_name_in_owner = true
 layout_mode = 2
 theme_override_constants/separation = 4
 
+[node name="WarningSeparator" type="HSeparator" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit"]
+layout_mode = 2
+
 [node name="WarningsPanel" type="PanelContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit"]
-custom_minimum_size = Vector2(0, 120)
+custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
+size_flags_vertical = 0
 
 [node name="WarningsSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/WarningsPanel"]
 layout_mode = 2
