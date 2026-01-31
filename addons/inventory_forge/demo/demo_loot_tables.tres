@@ -1,0 +1,99 @@
+[gd_resource type="Resource" script_class="LootTableDatabase" format=3 uid="uid://udrb46e4xj2s"]
+
+[ext_resource type="Script" uid="uid://c3galr8dvc5ff" path="res://addons/inventory_forge/resources/loot_table_database.gd" id="1_n2lop"]
+[ext_resource type="Script" uid="uid://4hpk2rho51vx" path="res://addons/inventory_forge/resources/loot_table.gd" id="2_cnrkw"]
+[ext_resource type="Script" uid="uid://cgfqwoudjapvm" path="res://addons/inventory_forge/resources/loot_entry.gd" id="3_cnrkw"]
+[ext_resource type="Texture2D" uid="uid://clvav7bu6osir" path="res://assets/inventory/Retro Inventory/Scaled 3x/Hearts_Yellow_1.png" id="4_p2nqn"]
+[ext_resource type="Script" uid="uid://cmpnse6xb1gml" path="res://addons/inventory_forge/resources/item_definition.gd" id="5_6icdo"]
+[ext_resource type="Script" uid="uid://drxf7y85w703a" path="res://addons/inventory_forge/resources/passive_entry.gd" id="5_iq7ne"]
+[ext_resource type="Texture2D" uid="uid://tk3wyir86kvr" path="res://assets/inventory/Retro Inventory/Scaled 2x/Settings_Cross03.png" id="6_6icdo"]
+[ext_resource type="Texture2D" uid="uid://5vw0j0j6id4e" path="res://assets/icons/Hearts_Red_3.png" id="6_iq7ne"]
+
+[sub_resource type="Resource" id="Resource_nnj7s"]
+script = ExtResource("5_6icdo")
+id = 1
+name_key = "ITEM_POTION_NAME"
+description_key = "ITEM_POTION_DESC"
+icon = ExtResource("4_p2nqn")
+category = 2
+stack_capacity = 50
+buy_price = 50
+sell_price = 25
+tradeable = false
+required_level = 1
+consumable = true
+effect_type = 1
+effect_value = 50
+is_ingredient = true
+
+[sub_resource type="Resource" id="Resource_p2nqn"]
+script = ExtResource("3_cnrkw")
+item = SubResource("Resource_nnj7s")
+weight = 0.2
+
+[sub_resource type="Resource" id="Resource_skb1v"]
+script = ExtResource("5_6icdo")
+id = 2
+name_key = "ITEM_SWORD_NAME"
+description_key = "ITEM_SWORD_DESC"
+icon = ExtResource("6_iq7ne")
+category = 1
+stack_capacity = 2
+stack_count_limit = 2
+buy_price = 200
+sell_price = 100
+required_level = 1
+equip_slot = 1
+stat_atk = 10
+craftable = true
+
+[sub_resource type="Resource" id="Resource_iq7ne"]
+script = ExtResource("3_cnrkw")
+item = SubResource("Resource_skb1v")
+
+[sub_resource type="Resource" id="Resource_nrclm"]
+script = ExtResource("2_cnrkw")
+id = "loot_table"
+name = "New Loot Table"
+rarity_tier = 5
+entries = Array[ExtResource("3_cnrkw")]([SubResource("Resource_p2nqn"), SubResource("Resource_iq7ne")])
+empty_chance = 0.98
+sub_table_ids = Array[String](["loot_table_1"])
+
+[sub_resource type="Resource" id="Resource_t0ne2"]
+script = ExtResource("5_6icdo")
+id = 3
+name_key = "ITEM_MEGA_POTION_NAME"
+description_key = "ITEM_MEGA_POTION_DESC"
+icon = ExtResource("6_6icdo")
+buy_price = 150
+sell_price = 75
+rarity = 3
+required_level = 5
+effect_value = 100
+is_ingredient = true
+craftable = true
+
+[sub_resource type="Resource" id="Resource_453nl"]
+script = ExtResource("3_cnrkw")
+item = SubResource("Resource_t0ne2")
+
+[sub_resource type="Resource" id="Resource_f0s5n"]
+script = ExtResource("2_cnrkw")
+id = "loot_table_1"
+name = "New Loot Table"
+entries = Array[ExtResource("3_cnrkw")]([SubResource("Resource_453nl")])
+
+[sub_resource type="Resource" id="Resource_lr03l"]
+script = ExtResource("2_cnrkw")
+id = "loot_table_2"
+name = "New Loot Table"
+
+[sub_resource type="Resource" id="Resource_dlsdc"]
+script = ExtResource("2_cnrkw")
+id = "loot_table_3"
+name = "New Loot Table"
+
+[resource]
+script = ExtResource("1_n2lop")
+tables = Array[ExtResource("2_cnrkw")]([SubResource("Resource_nrclm"), SubResource("Resource_f0s5n"), SubResource("Resource_lr03l"), SubResource("Resource_dlsdc")])

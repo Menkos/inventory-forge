@@ -77,6 +77,31 @@ enum MaterialType {
 }
 
 
+## Passive effect type
+enum PassiveType {
+	NONE,              ## No passive effect
+	LIFESTEAL,         ## Heal on hit (% of damage)
+	FIRE_DAMAGE,       ## Bonus fire damage
+	ICE_DAMAGE,        ## Bonus ice damage
+	LIGHTNING_DAMAGE,  ## Bonus lightning damage
+	POISON_DAMAGE,     ## Bonus poison damage
+	CRITICAL_CHANCE,   ## Bonus critical hit chance
+	CRITICAL_DAMAGE,   ## Bonus critical damage multiplier
+	DODGE_CHANCE,      ## Chance to dodge attacks
+	BLOCK_CHANCE,      ## Chance to block attacks
+	HP_REGEN,          ## HP regeneration per turn
+	MP_REGEN,          ## MP regeneration per turn
+	FIRE_RESIST,       ## Fire damage resistance
+	ICE_RESIST,        ## Ice damage resistance
+	LIGHTNING_RESIST,  ## Lightning damage resistance
+	POISON_RESIST,     ## Poison damage resistance
+	STUN_RESIST,       ## Stun resistance
+	THORNS,            ## Reflect damage to attacker
+	BONUS_EXP,         ## Bonus experience gain
+	BONUS_GOLD,        ## Bonus gold drop
+}
+
+
 ## Helper: Gets the translated category name
 static func get_category_name(category: Category) -> String:
 	match category:
@@ -160,3 +185,55 @@ static func get_material_type_name(mat_type: MaterialType) -> String:
 		MaterialType.MAGICAL: return "MATERIAL_MAGICAL"
 		MaterialType.MISC: return "MATERIAL_MISC"
 		_: return "MATERIAL_UNKNOWN"
+
+
+## Helper: Gets the translated passive type name
+static func get_passive_type_name(passive: PassiveType) -> String:
+	match passive:
+		PassiveType.NONE: return "PASSIVE_NONE"
+		PassiveType.LIFESTEAL: return "PASSIVE_LIFESTEAL"
+		PassiveType.FIRE_DAMAGE: return "PASSIVE_FIRE_DAMAGE"
+		PassiveType.ICE_DAMAGE: return "PASSIVE_ICE_DAMAGE"
+		PassiveType.LIGHTNING_DAMAGE: return "PASSIVE_LIGHTNING_DAMAGE"
+		PassiveType.POISON_DAMAGE: return "PASSIVE_POISON_DAMAGE"
+		PassiveType.CRITICAL_CHANCE: return "PASSIVE_CRITICAL_CHANCE"
+		PassiveType.CRITICAL_DAMAGE: return "PASSIVE_CRITICAL_DAMAGE"
+		PassiveType.DODGE_CHANCE: return "PASSIVE_DODGE_CHANCE"
+		PassiveType.BLOCK_CHANCE: return "PASSIVE_BLOCK_CHANCE"
+		PassiveType.HP_REGEN: return "PASSIVE_HP_REGEN"
+		PassiveType.MP_REGEN: return "PASSIVE_MP_REGEN"
+		PassiveType.FIRE_RESIST: return "PASSIVE_FIRE_RESIST"
+		PassiveType.ICE_RESIST: return "PASSIVE_ICE_RESIST"
+		PassiveType.LIGHTNING_RESIST: return "PASSIVE_LIGHTNING_RESIST"
+		PassiveType.POISON_RESIST: return "PASSIVE_POISON_RESIST"
+		PassiveType.STUN_RESIST: return "PASSIVE_STUN_RESIST"
+		PassiveType.THORNS: return "PASSIVE_THORNS"
+		PassiveType.BONUS_EXP: return "PASSIVE_BONUS_EXP"
+		PassiveType.BONUS_GOLD: return "PASSIVE_BONUS_GOLD"
+		_: return "PASSIVE_UNKNOWN"
+
+
+## Helper: Gets display name for passive (non-translated, for editor)
+static func get_passive_display_name(passive: PassiveType) -> String:
+	match passive:
+		PassiveType.NONE: return "None"
+		PassiveType.LIFESTEAL: return "Lifesteal"
+		PassiveType.FIRE_DAMAGE: return "Fire Damage"
+		PassiveType.ICE_DAMAGE: return "Ice Damage"
+		PassiveType.LIGHTNING_DAMAGE: return "Lightning Damage"
+		PassiveType.POISON_DAMAGE: return "Poison Damage"
+		PassiveType.CRITICAL_CHANCE: return "Critical Chance"
+		PassiveType.CRITICAL_DAMAGE: return "Critical Damage"
+		PassiveType.DODGE_CHANCE: return "Dodge Chance"
+		PassiveType.BLOCK_CHANCE: return "Block Chance"
+		PassiveType.HP_REGEN: return "HP Regen"
+		PassiveType.MP_REGEN: return "MP Regen"
+		PassiveType.FIRE_RESIST: return "Fire Resist"
+		PassiveType.ICE_RESIST: return "Ice Resist"
+		PassiveType.LIGHTNING_RESIST: return "Lightning Resist"
+		PassiveType.POISON_RESIST: return "Poison Resist"
+		PassiveType.STUN_RESIST: return "Stun Resist"
+		PassiveType.THORNS: return "Thorns"
+		PassiveType.BONUS_EXP: return "Bonus EXP"
+		PassiveType.BONUS_GOLD: return "Bonus Gold"
+		_: return "Unknown"

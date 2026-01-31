@@ -221,6 +221,17 @@ signal changed_item()
 		changed_item.emit()
 
 
+# === Passives ===
+@export_group("Passives")
+
+## Passive effects on this item (only for equippable items)
+@export var passives: Array[PassiveEntry] = []:
+	set(value):
+		passives = value
+		emit_changed()
+		changed_item.emit()
+
+
 # === Custom Fields ===
 @export_group("Custom Fields")
 
@@ -409,13 +420,23 @@ func duplicate_item() -> ItemDefinition:
 	new_item.material_type = material_type
 	new_item.craftable = craftable
 	new_item.ingredients = ingredients.duplicate(true)
+	# Duplica passives
+	new_item.passives = []
+	for p in passives:
+		if p:
+			new_item.passives.append(p.duplicate_passive())
 	new_item.custom_fields = custom_fields.duplicate(true)
-	
+
 	return new_item
 
 
 ## Converte l'item in un Dictionary (per serializzazione/debug)
 func to_dictionary() -> Dictionary:
+	var passives_data = []
+	for p in passives:
+		if p:
+			passives_data.append(p.to_dict())
+
 	return {
 		"id": id,
 		"name_key": name_key,
@@ -435,6 +456,7 @@ func to_dictionary() -> Dictionary:
 		"is_ingredient": is_ingredient,
 		"material_type": material_type,
 		"craftable": craftable,
+		"passives": passives_data,
 		"custom_fields": custom_fields.duplicate(),
 	}
 

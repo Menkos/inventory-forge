@@ -1,6 +1,11 @@
-[gd_scene load_steps=2 format=3 uid="uid://cwbsm8ma4bh48"]
+[gd_scene load_steps=7 format=3 uid="uid://cwbsm8ma4bh48"]
 
 [ext_resource type="Script" uid="uid://cd4jal3t1dmom" path="res://addons/inventory_forge/inventory_forge_main.gd" id="1_main"]
+[ext_resource type="Texture2D" uid="uid://clvav7bu6osir" path="res://assets/inventory/Retro Inventory/Scaled 3x/Hearts_Yellow_1.png" id="2_5v7db"]
+[ext_resource type="Texture2D" uid="uid://5vw0j0j6id4e" path="res://assets/icons/Hearts_Red_3.png" id="3_3cpo6"]
+[ext_resource type="Texture2D" uid="uid://tk3wyir86kvr" path="res://assets/inventory/Retro Inventory/Scaled 2x/Settings_Cross03.png" id="4_fb57n"]
+[ext_resource type="Texture2D" uid="uid://cbvldspvujfue" path="res://assets/inventory/Retro Inventory/Scaled 2x/Settings_Cross02.png" id="5_xujem"]
+[ext_resource type="Texture2D" uid="uid://bxwkqwt4eyuqu" path="res://assets/inventory/Retro Inventory/Scaled 2x/Settings_Cross01.png" id="6_fbgn6"]
 
 [node name="InventoryForgeMain" type="Control"]
 layout_mode = 3
@@ -21,10 +26,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+current_tab = 0
 
 [node name="Items" type="HSplitContainer" parent="MainTabContainer"]
 layout_mode = 2
 split_offset = 300
+metadata/_tab_index = 0
 
 [node name="LeftPanel" type="VBoxContainer" parent="MainTabContainer/Items"]
 custom_minimum_size = Vector2(280, 0)
@@ -89,7 +96,7 @@ size_flags_horizontal = 3
 [node name="ItemCountLabel" type="Label" parent="MainTabContainer/Items/LeftPanel/Toolbar"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "4 items"
+text = "5 items"
 
 [node name="SearchEdit" type="LineEdit" parent="MainTabContainer/Items/LeftPanel"]
 unique_name_in_owner = true
@@ -101,7 +108,7 @@ clear_button_enabled = true
 unique_name_in_owner = true
 layout_mode = 2
 selected = 0
-item_count = 8
+item_count = 7
 popup/item_0/text = "All Categories"
 popup/item_0/id = 0
 popup/item_1/text = "Consumable"
@@ -112,18 +119,27 @@ popup/item_3/text = "Armor"
 popup/item_3/id = 2
 popup/item_4/text = "Accessory"
 popup/item_4/id = 3
-popup/item_5/text = "Material"
+popup/item_5/text = "Key Item"
 popup/item_5/id = 4
-popup/item_6/text = "Key Item"
+popup/item_6/text = "Misc"
 popup/item_6/id = 5
-popup/item_7/text = "Misc"
-popup/item_7/id = 6
 
 [node name="ItemList" type="ItemList" parent="MainTabContainer/Items/LeftPanel"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 allow_reselect = true
+item_count = 5
+item_0/text = "[1] ITEM_POTION_NAME"
+item_0/icon = ExtResource("2_5v7db")
+item_1/text = "[2] ITEM_SWORD_NAME"
+item_1/icon = ExtResource("3_3cpo6")
+item_2/text = "[3] ITEM_MEGA_POTION_NAME"
+item_2/icon = ExtResource("4_fb57n")
+item_3/text = "[4] ITEM_PALLA_DI_FUOCO_NAME"
+item_3/icon = ExtResource("5_xujem")
+item_4/text = "[5] ITEM_CACCA_NAME"
+item_4/icon = ExtResource("6_fbgn6")
 
 [node name="RightPanel" type="PanelContainer" parent="MainTabContainer/Items"]
 layout_mode = 2
@@ -300,7 +316,7 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 selected = 0
-item_count = 7
+item_count = 6
 popup/item_0/text = "Consumable"
 popup/item_0/id = 0
 popup/item_1/text = "Weapon"
@@ -309,12 +325,10 @@ popup/item_2/text = "Armor"
 popup/item_2/id = 2
 popup/item_3/text = "Accessory"
 popup/item_3/id = 3
-popup/item_4/text = "Material"
+popup/item_4/text = "Key Item"
 popup/item_4/id = 4
-popup/item_5/text = "Key Item"
+popup/item_5/text = "Misc"
 popup/item_5/id = 5
-popup/item_6/text = "Misc"
-popup/item_6/id = 6
 
 [node name="StackSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/TwoColumnsContainer/LeftColumn"]
 layout_mode = 2
@@ -744,6 +758,32 @@ text = "Material Type"
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
+selected = 0
+item_count = 12
+popup/item_0/text = "None"
+popup/item_0/id = 0
+popup/item_1/text = "Ore"
+popup/item_1/id = 1
+popup/item_2/text = "Herb"
+popup/item_2/id = 2
+popup/item_3/text = "Wood"
+popup/item_3/id = 3
+popup/item_4/text = "Leather"
+popup/item_4/id = 4
+popup/item_5/text = "Cloth"
+popup/item_5/id = 5
+popup/item_6/text = "Gem"
+popup/item_6/id = 6
+popup/item_7/text = "Liquid"
+popup/item_7/id = 7
+popup/item_8/text = "Component"
+popup/item_8/id = 8
+popup/item_9/text = "Food"
+popup/item_9/id = 9
+popup/item_10/text = "Magical"
+popup/item_10/id = 10
+popup/item_11/text = "Misc"
+popup/item_11/id = 11
 
 [node name="CraftingSeparator" type="HSeparator" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection"]
 layout_mode = 2
@@ -792,6 +832,50 @@ size_flags_vertical = 3
 horizontal_scroll_mode = 0
 
 [node name="IngredientsListVBox" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/CraftingSection/IngredientsContainer/IngredientsScroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="PassivesSection" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="PassivesSectionLabel" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/PassivesSection"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0.4, 1)
+theme_override_font_sizes/font_size = 14
+text = "PASSIVES"
+
+[node name="PassivesHeader" type="HBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/PassivesSection"]
+layout_mode = 2
+
+[node name="PassivesInfo" type="Label" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/PassivesSection/PassivesHeader"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_font_sizes/font_size = 11
+text = "Special abilities for equippable items"
+
+[node name="PassivesSpacer" type="Control" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/PassivesSection/PassivesHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AddPassiveButton" type="Button" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/PassivesSection/PassivesHeader"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+tooltip_text = "Add passive (max 5)"
+text = "+ Add Passive"
+
+[node name="PassivesScroll" type="ScrollContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/PassivesSection"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="PassivesListVBox" type="VBoxContainer" parent="MainTabContainer/Items/RightPanel/MarginContainer/MainVSplit/DetailsContainer/DetailsVBox/PassivesSection/PassivesScroll"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
@@ -851,8 +935,10 @@ unique_name_in_owner = true
 layout_mode = 2
 
 [node name="LootTables" type="HSplitContainer" parent="MainTabContainer"]
+visible = false
 layout_mode = 2
 split_offset = 280
+metadata/_tab_index = 1
 
 [node name="LootLeftPanel" type="VBoxContainer" parent="MainTabContainer/LootTables"]
 layout_mode = 2
@@ -917,7 +1003,7 @@ size_flags_horizontal = 3
 [node name="LootTableCountLabel" type="Label" parent="MainTabContainer/LootTables/LootLeftPanel/LootToolbar"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "0 tables"
+text = "4 tables"
 
 [node name="LootSearchEdit" type="LineEdit" parent="MainTabContainer/LootTables/LootLeftPanel"]
 unique_name_in_owner = true
@@ -930,6 +1016,11 @@ unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
 allow_reselect = true
+item_count = 4
+item_0/text = "[loot_table] New Loot Table"
+item_1/text = "[loot_table_1] New Loot Table"
+item_2/text = "[loot_table_2] New Loot Table"
+item_3/text = "[loot_table_3] New Loot Table"
 
 [node name="LootRightPanel" type="PanelContainer" parent="MainTabContainer/LootTables"]
 layout_mode = 2
@@ -947,7 +1038,6 @@ theme_override_constants/margin_bottom = 15
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 4
-size_flags_vertical = 4
 theme_override_colors/font_color = Color(0.6, 0.6, 0.6, 1)
 text = "Select a loot table to edit"
 
@@ -1089,7 +1179,6 @@ text = "Drops:"
 [node name="MinDropsSpinBox" type="SpinBox" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/DropsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-min_value = 0.0
 max_value = 10.0
 value = 1.0
 
@@ -1100,7 +1189,6 @@ text = " to "
 [node name="MaxDropsSpinBox" type="SpinBox" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/DropsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-min_value = 0.0
 max_value = 10.0
 value = 1.0
 
@@ -1119,7 +1207,6 @@ text = "Empty Chance:"
 [node name="EmptyChanceSpinBox" type="SpinBox" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection/EmptyChanceRow"]
 unique_name_in_owner = true
 layout_mode = 2
-max_value = 100.0
 suffix = "%"
 
 [node name="AllowDuplicatesRow" type="HBoxContainer" parent="MainTabContainer/LootTables/LootRightPanel/LootMarginContainer/LootDetailsScroll/LootDetailsVBox/LootSettingsSection"]
@@ -1234,11 +1321,13 @@ bbcode_enabled = true
 text = "[i]Click 'Roll!' to test the loot table[/i]"
 
 [node name="Statistics" type="MarginContainer" parent="MainTabContainer"]
+visible = false
 layout_mode = 2
 theme_override_constants/margin_left = 20
 theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 20
 theme_override_constants/margin_bottom = 20
+metadata/_tab_index = 2
 
 [node name="StatsScrollContainer" type="ScrollContainer" parent="MainTabContainer/Statistics"]
 unique_name_in_owner = true

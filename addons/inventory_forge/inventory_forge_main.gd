@@ -85,6 +85,11 @@ const MAX_INGREDIENTS := 10  # Limite massimo ingredienti per ricetta
 @onready var add_custom_field_button: Button = get_node_or_null("%AddCustomFieldButton")
 @onready var custom_fields_container: VBoxContainer = get_node_or_null("%CustomFieldsContainer")
 
+# Passives
+@onready var passives_section: VBoxContainer = get_node_or_null("%PassivesSection")
+@onready var add_passive_button: Button = get_node_or_null("%AddPassiveButton")
+@onready var passives_list_vbox: VBoxContainer = get_node_or_null("%PassivesListVBox")
+
 # Validation
 @onready var warnings_container: VBoxContainer = %WarningsContainer
 
@@ -318,7 +323,11 @@ func _connect_signals() -> void:
 	craftable_check.toggled.connect(_on_craftable_toggled)
 	if add_ingredient_button:
 		add_ingredient_button.pressed.connect(_on_add_ingredient_pressed)
-	
+
+	# Passives
+	if add_passive_button:
+		add_passive_button.pressed.connect(_on_add_passive_pressed)
+
 	# Custom Fields
 	if add_custom_field_button:
 		add_custom_field_button.pressed.connect(_on_add_custom_field_pressed)
@@ -447,7 +456,13 @@ func _update_details_panel() -> void:
 	ingredients_container.visible = selected_item.craftable
 	if selected_item.craftable:
 		_populate_ingredients_ui()
-	
+
+	# Passives (solo per item equipaggiabili)
+	if passives_section:
+		passives_section.visible = selected_item.equippable
+	if selected_item.equippable:
+		_populate_passives_ui()
+
 	# Custom Fields
 	_populate_custom_fields_ui()
 	
@@ -1123,6 +1138,164 @@ func _on_is_ingredient_toggled(pressed: bool) -> void:
 func _on_material_type_changed(index: int) -> void:
 	if selected_item and not is_updating_ui:
 		selected_item.material_type = index as ItemEnums.MaterialType
+		_mark_modified()
+
+
+# === Passives Management ===
+
+const MAX_PASSIVES := 5  # Limite massimo passives per item
+
+func _populate_passives_ui() -> void:
+	if selected_item == null or passives_list_vbox == null:
+		return
+
+	# Pulisci la lista corrente
+	for child in passives_list_vbox.get_children():
+		child.queue_free()
+
+	# Se non ci sono passives, mostra messaggio vuoto
+	if selected_item.passives.is_empty():
+		var empty_label := Label.new()
+		empty_label.text = "No passives. Click + Add Passive to add one."
+		empty_label.add_theme_color_override("font_color", Color(0.6, 0.6, 0.6, 1))
+		empty_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		passives_list_vbox.add_child(empty_label)
+		return
+
+	# Crea una riga per ogni passive
+	for i in range(selected_item.passives.size()):
+		var passive: PassiveEntry = selected_item.passives[i]
+		if passive == null:
+			continue
+		var row := _create_passive_row(passive, i)
+		passives_list_vbox.add_child(row)
+
+
+func _create_passive_row(passive: PassiveEntry, row_index: int) -> HBoxContainer:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+
+	# === Passive Type (OptionButton) ===
+	var type_option := OptionButton.new()
+	type_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	type_option.custom_minimum_size = Vector2(180, 0)
+
+	# Popola con tutti i tipi di passive
+	for pt in ItemEnums.PassiveType.values():
+		var display_name := ItemEnums.get_passive_display_name(pt)
+		type_option.add_item(display_name, pt)
+		if pt == passive.passive_type:
+			type_option.selected = type_option.item_count - 1
+
+	type_option.item_selected.connect(_on_passive_type_changed.bind(row_index))
+	row.add_child(type_option)
+
+	# === Value Label ===
+	var value_label := Label.new()
+	value_label.text = "Value:"
+	value_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(value_label)
+
+	# === Value SpinBox ===
+	var value_spinbox := SpinBox.new()
+	value_spinbox.min_value = -999
+	value_spinbox.max_value = 999
+	value_spinbox.value = passive.value
+	value_spinbox.custom_minimum_size = Vector2(80, 0)
+	value_spinbox.value_changed.connect(_on_passive_value_changed.bind(row_index))
+	row.add_child(value_spinbox)
+
+	# === Chance Label ===
+	var chance_label := Label.new()
+	chance_label.text = "%"
+	chance_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	row.add_child(chance_label)
+
+	# === Chance SpinBox ===
+	var chance_spinbox := SpinBox.new()
+	chance_spinbox.min_value = 0
+	chance_spinbox.max_value = 100
+	chance_spinbox.value = passive.trigger_chance
+	chance_spinbox.custom_minimum_size = Vector2(70, 0)
+	chance_spinbox.suffix = "%"
+	chance_spinbox.value_changed.connect(_on_passive_chance_changed.bind(row_index))
+	row.add_child(chance_spinbox)
+
+	# === Remove Button ===
+	var remove_button := Button.new()
+	remove_button.text = "X"
+	remove_button.custom_minimum_size = Vector2(32, 0)
+	remove_button.tooltip_text = "Remove passive"
+	remove_button.pressed.connect(_on_remove_passive_pressed.bind(row_index))
+	row.add_child(remove_button)
+
+	return row
+
+
+func _on_add_passive_pressed() -> void:
+	if selected_item == null:
+		return
+
+	# Controlla il limite massimo
+	if selected_item.passives.size() >= MAX_PASSIVES:
+		push_warning("[InventoryForge] Maximum %d passives per item" % MAX_PASSIVES)
+		return
+
+	# Aggiungi nuova passive con valori default
+	var new_passive := PassiveEntry.new()
+	new_passive.passive_type = ItemEnums.PassiveType.NONE
+	new_passive.value = 0
+	new_passive.trigger_chance = 100.0
+	selected_item.passives.append(new_passive)
+	_populate_passives_ui()
+	_mark_modified()
+
+
+func _on_remove_passive_pressed(row_index: int) -> void:
+	if selected_item == null or row_index < 0 or row_index >= selected_item.passives.size():
+		return
+
+	selected_item.passives.remove_at(row_index)
+	_populate_passives_ui()
+	_mark_modified()
+
+
+func _on_passive_type_changed(item_index: int, row_index: int) -> void:
+	if selected_item == null or row_index < 0 or row_index >= selected_item.passives.size():
+		return
+
+	if is_updating_ui:
+		return
+
+	var passive: PassiveEntry = selected_item.passives[row_index]
+	if passive:
+		passive.passive_type = item_index as ItemEnums.PassiveType
+		_mark_modified()
+
+
+func _on_passive_value_changed(value: float, row_index: int) -> void:
+	if selected_item == null or row_index < 0 or row_index >= selected_item.passives.size():
+		return
+
+	if is_updating_ui:
+		return
+
+	var passive: PassiveEntry = selected_item.passives[row_index]
+	if passive:
+		passive.value = int(value)
+		_mark_modified()
+
+
+func _on_passive_chance_changed(value: float, row_index: int) -> void:
+	if selected_item == null or row_index < 0 or row_index >= selected_item.passives.size():
+		return
+
+	if is_updating_ui:
+		return
+
+	var passive: PassiveEntry = selected_item.passives[row_index]
+	if passive:
+		passive.trigger_chance = value
 		_mark_modified()
 
 
